@@ -6,7 +6,7 @@
 **👤 Kostas Alexandridis, PhD, GISP** | *🏷️ v. 2025.0, Month 2025*
 
 ![Static Badge](https://img.shields.io/badge/OCTL-GitHub?style=plastic&logo=github&logoSize=auto&labe=GitHub&labelColor=navy) 
-![GitHub License](https://img.shields.io/github/license/ktalexan/project?style=plastic&labelcolor=black) 
+![GitHub License](https://img.shields.io/github/license/ktalexan/OCTL?style=plastic&labelcolor=black) 
 ![Shield Badge: Language-Python](https://img.shields.io/static/v1?style=plastic&label=language&message=Python&logo=python&color=forestgreen&logoColor=blue&labelColor=black)
 
 </div>
