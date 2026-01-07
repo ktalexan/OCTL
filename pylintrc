@@ -419,7 +419,7 @@ confidence = HIGH, CONTROL_FLOW, INFERENCE, INFERENCE_FAILURE, UNDEFINED
 # --enable=similarities". If you want to run only the classes checker, but have
 # no Warning level messages displayed, use "--disable=all --enable=classes
 # --disable=W".
-disable = missing-function-docstring, missing-module-docstring, trailing-whitespace, line-too-long, unused-import, multiple-imports, pointless-statement, raw-checker-failed, bad-inline-option, locally-disabled, file-ignored, suppressed-message, useless-suppression, deprecated-pragma, use-symbolic-message-instead, use-implicit-booleaness-not-comparison-to-string, use-implicit-booleaness-not-comparison-to-zero, assigning-non-slot, no-member, too-many-lines, redefined-outer-name, wrong-import-position
+disable = missing-function-docstring, missing-module-docstring, trailing-whitespace, line-too-long, unused-import, multiple-imports, pointless-statement, raw-checker-failed, bad-inline-option, locally-disabled, file-ignored, suppressed-message, useless-suppression, deprecated-pragma, use-symbolic-message-instead, use-implicit-booleaness-not-comparison-to-string, use-implicit-booleaness-not-comparison-to-zero, assigning-non-slot, no-member, too-many-lines, redefined-outer-name, wrong-import-position, logging-format-interpolation, unused-argument
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
@@ -533,8 +533,8 @@ spelling-store-unknown-words = no
 
 # This flag controls whether inconsistent-quotes generates a warning when the
 # character used as a quote delimiter is used inconsistently within a module.
-#check-quote-consistency = no
-check-quote-consistency = yes
+check-quote-consistency = no
+#check-quote-consistency = yes
 
 # This flag controls whether the implicit-str-concat should generate a warning
 # on implicit string concatenation in sequences defined over several lines.
