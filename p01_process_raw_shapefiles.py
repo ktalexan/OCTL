@@ -69,5 +69,3 @@ logo_icons = {
     "H": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/412ef3a8487141dc8efbf7e2002cf695/data",
     "S": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/59662c66336141a4af9e888c10460905/data"
     }
-
-
