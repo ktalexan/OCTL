@@ -1,7 +1,7 @@
-<h1 align = "center">🗄️ Project Title</h1>
+<h1 align = "center">🗄️ Orange County Tiger/Lines (OCTL) Repository</h1>
 <div align = "center">
 
-<h3>🔖 Project Short Description</h3>
+<h3>🔖 US Censys Tiger/Lines Geodatabases for Orange County, California</h3>
 
 **👤 Kostas Alexandridis, PhD, GISP** | *🏷️ v. 2025.0, Month 2025*
 
