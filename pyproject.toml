@@ -1,0 +1,20 @@
+[tool.black]
+line-length = 120
+skip-string-normalization = true
+skip-magic-trailing-comma = true
+exclude = '''
+/(
+    \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+force-exclude = 'tests/data/'
+include = '\.pyi?$'
+preview = true
