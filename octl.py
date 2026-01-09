@@ -6,18 +6,18 @@
 # Version: 2025.2, Date: December 2025
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-print("\nOrange County Tiger Lines (OCTL): Main Processing Script\n")
-
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Import necessary libraries ----
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+import os, sys
+import json
+import pandas as pd
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Class Containing the OCTL Processing Workflow Functions ----
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 class OCTL:
     """Class Containing the OCTL Processing Workflow Functions.
 
@@ -25,14 +25,207 @@ class OCTL:
     data. It includes methods for initialization, main execution, and retrieving
     metadata for various feature classes.
     """
-    def __init__(self):
+    
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ## Fx: Initialize the OCTL Class ----
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    def __init__(self, part: int, version: float):
         """Initialize the OCTL class."""
-        pass
+        self.part = part
+        self.version = version
+        self.base_path = os.getcwd()
 
-    def main(self):
-        """Main execution method for the OCTL class."""
-        pass
+        # Create a prj_meta variable calling the project_metadata function
+        self.prj_meta = self.project_metadata(silent = False)
 
+        # Create a prj_dirs variable calling the project_directories function
+        self.prj_dirs = self.project_directories(silent = False)
+
+        # Load the codebook
+        self.cb_path = os.path.join(self.prj_dirs["codebook"], "cb.json")
+        self.cb, self.cbdf = self.load_cb(silent = False)
+
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ## Fx: Obtain the US Congress Number ----
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    def get_congress_number(self, census_year: int) -> int:
+        """
+        Returns the US Congress Number given a year.
+        Args:
+            census_year (int): The year of the US Congress
+        Returns:
+            congress_no (int): The US Congress number for the year.
+        Raises:
+            ValueError: if the census_year is not integer, or if it is not numeric.
+        Example:
+            >>> congress_number = self.congress_number(census_year = 2020)
+        Notes:
+            This function queries the congress dictionary using the US Congress year, and obtains (and returns) the US Congress Number for that year.
+        """
+        # US Congress Number by Year Dictionary
+        congress_dict = {
+            2010: 111,
+            2011: 112,
+            2012: 112,
+            2013: 113,
+            2014: 114,
+            2015: 114,
+            2016: 115,
+            2017: 115,
+            2018: 116,
+            2019: 116,
+            2020: 116,
+            2021: 116,
+            2022: 118,
+            2023: 118,
+            2024: 119,
+            2025: 119,
+        }
+
+        # Get the Congress number from the dictionary
+        congress_no = int(congress_dict.get(census_year))
+
+        # Return the Congress Number
+        return congress_no
+
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ## Fx: Create Project Metadata ----
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
+    def project_metadata(self, silent: bool = False) -> dict:
+        """
+        Function to generate project metadata for the OCTL data processing object.
+        Args:
+            silent (bool): If True, suppresses the print output. Default is False.
+        Returns:
+            metadata (dict): A dictionary containing the project metadata. The dictionary includes: name, title, description, version, author, years, date_start, date_end, date_updated, and TIMS metadata.
+        Raises:
+            ValueError: If part is not an integer, or if version is not numeric.
+        Example:
+            >>> metadata = self.project_metadata()
+        Notes:
+            This function generates a dictionary with project metadata based on the provided part and version.
+            The function also checks if the TIMS metadata file exists and raises an error if it does not.
+        """
+        
+        # Match the part to a specific step and description (with default case)
+        match self.part:
+            case 0:
+                step = "Part 0: General Data Updating"
+                desc = "General Data Updating and Mentenance"
+            case 1:
+                step = "Part 1: Raw Data Processing"
+                desc = "Processing Raw Tiger/Line Shapefiles Folder"
+            case 2:
+                step = "Part 2: Geodatabase Data Processing"
+                desc = "Processing Spatial Data Frame Data to Yearly Geodatabase Feature Classes"
+            case 3:
+                step = "Part 3: Sharing and Publishing Feature Classes"
+                desc = "Sharing and Publishing Feature Classes to ArcGIS Online"
+            case _:
+                step = "Part 0: General Data Updating"
+                desc = "General Data Updating and Maintenance (default)"
+        
+        # Create a dictionary to hold the metadata
+        metadata = {
+            "name": "OCTL Tiger/Line Data Processing",
+            "title": step,
+            "description": desc,
+            "version": self.version,
+            "author": "Dr. Kostas Alexandridis, GISP",
+            "years": "",
+        }
+
+        # If not silent, print the metadata
+        if not silent:
+            print(
+                f"\nProject Metadata:\n- Name: {metadata["name"]}\n- Title: {metadata["title"]}\n- Description: {metadata["description"]}\n- Version: {metadata["version"]}\n- Author: {metadata["author"]}"
+            )
+        
+        # Return the metadata
+        return metadata
+
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ## Fx: Create Project Directories ----
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~        
+    def project_directories(self, silent: bool = False) -> dict:
+        """
+        Function to generate project directories for the OCTL data processing project.
+        Args:
+            silent (bool): If True, suppresses the print output. Default is False.
+        Returns:
+            prj_dirs (dict): A dictionary containing the project directories.
+        Raises:
+            ValueError: if base_path is not a string
+        Example:
+            >>> prj_dirs = self.project_directories()
+        Notes:
+            This function creates a dictionary of project directories based on the base path.
+            The function also checks if the base path exists and raises an error if it does not.
+        """
+        prj_dirs = {
+            "root": self.base_path,
+            "admin": os.path.join(self.base_path, "admin"),
+            "analysis": os.path.join(self.base_path, "analysis"),
+            "codebook": os.path.join(self.base_path, "codebook"),
+            "data": os.path.join(self.base_path, "data"),
+            "data_archived": os.path.join(self.base_path, "data", "archived"),
+            "data_processed": os.path.join(self.base_path, "data", "processed"),
+            "data_raw": os.path.join(self.base_path, "data", "raw"),
+            "gis": os.path.join(self.base_path, "gis"),
+            "graphics": os.path.join(self.base_path, "graphics"),
+            "metadata": os.path.join(self.base_path, "metadata"),
+            "notebooks": os.path.join(self.base_path, "notebooks"),
+            "scripts": os.path.join(self.base_path, "scripts")
+        }
+
+        # Print the project directories
+        if not silent:
+            print("\nProject Directories:")
+            for key, value in prj_dirs.items():
+                print(f"- {key}: {value}")
+        
+        # Return the project directories
+        return prj_dirs
+
+
+    
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ## Fx: Load Codebook Function ----
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    def load_cb(self, silent: bool = False) -> tuple:
+        """
+        Load the codebook.
+        Args:
+            silent (bool): If True, suppresses the print output. Default is False.
+        Returns:
+            cb (dict): The codebook.
+            df_cb (pd.DataFrame): The codebook data frame.
+        Raises:
+            Nothing
+        Example:
+            >>>cb, df_cb = load_cb()
+        Notes:
+            This function loads the codebook from the codebook path.
+        """
+        with open(self.cb_path, encoding = "utf-8") as json_file:
+            cb = json.load(json_file)
+        
+        # Create a codebook data frame
+        cbdf = pd.DataFrame(cb).transpose()
+        # Add attributes to the codebook data frame
+        cbdf.attrs["name"] = "Codebook"
+        
+        if not silent:
+            print("\nCodebook:\n", cbdf)
+        return cb, cbdf
+
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ## Fx: Get Metadata for Feature Classes ----
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     def get_metadata(self, census_year, no_congress):
         fc_metadata = {
             "ADDR": {
@@ -578,9 +771,12 @@ class OCTL:
         }
         return fc_metadata
 
-if __name__ == "__main__":
-    OCTL().main()
 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Main ----
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+if __name__ == "__main__":
+    pass
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # End of Script ----

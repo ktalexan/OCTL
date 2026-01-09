@@ -6,54 +6,100 @@ import arcpy
 from arcgis.features import GeoAccessor, GeoSeriesAccessor
 from octl import OCTL
 
-octl = OCTL()
-octl.main()
+octl = OCTL(part = 0, version = 2026.1)
 
-# List the folders under the "data/raw" directory
-raw_dir = Path(os.path.join(os.getcwd(), "data", "raw"))
-# List only the folders in the raw_dir
-folders = list(raw_dir.glob("tl_*"))
-# remove the "tl_" prefix from the folder names
+prj_meta = octl.prj_meta
+prj_dirs = octl.prj_dirs
+
+cb = octl.cb
+cbdf = octl.cbdf
+
+
+# Get the Path of the raw data directory
+path = Path(prj_dirs["data_raw"])
+
+# List only the folders of the path
+folders = list(path.glob("tl_*"))
+
+# Remove the "tl_" prefix from the folder names
 folders = [f.name.replace("tl_", "") for f in folders]
-# Make sure there is only one folder
-if len(folders) != 1:
-    raise ValueError("There should be only one folder under the 'data/raw' directory")
-folder_name = folders[0]
-# Remove the "tl_" prefix from the folder name and convert to integer
-year = int(folder_name.replace("tl_", ""))
-print("Year: ", year)
+
+# Check if there is only one folder
+if len(folders) == 1:
+    folder_name = folders[0]
+elif len(folders) > 1:
+    folder_name = folders
+else:
+    raise ValueError("There should be at least one folder under the 'data/raw' directory")
+
+# Get the year by converting the folder_name to an integer
+year = int(folder_name)
+print(f"Year: {year}")
 
 # Get the folder path
-folder_path = Path(os.path.join(os.getcwd(), "data", "raw", f"tl_{year}"))
-print(folder_path)
-# List the shapefiles in the folder
-shapefiles = list(folder_path.glob("*.shp"))
-# Print the shapefiles
-print(shapefiles)
+tl_folder = Path(os.path.join(os.getcwd(), "data", "raw", f"tl_{year}"))
+print(tl_folder)
 
-# Using ArcGIS API for Python (Spatially Enabled DataFrame)
+# Remove the year prefix, and the extension and obtain only the unique names
+tl_files = list(set([f.replace(f"tl_{year}_", "").split(".")[0] for f in os.listdir(tl_folder)]))
+print(f"There are {len(tl_files)} unique files in the Tiger/Line Folder")
+
+# Define an empty dictionary to hold the imported spatial data frames
 sdfs = {}
-for shp in shapefiles:
-    layer_name = shp.stem
-    print(f"Reading {layer_name} with ArcGIS SEDF...")
-    try:
-        # from_featureclass can read shapefiles if passed as path
-        sdfs[layer_name] = GeoAccessor.from_featureclass(str(shp))
-        print(f"  - Loaded {layer_name}: {sdfs[layer_name].shape[0]} rows, {sdfs[layer_name].shape[1]} columns")
-        print(f"  - CRS WKID: {sdfs[layer_name].spatial.sr.wkid}")
-    except Exception as e:
-        print(f"  - Error loading {layer_name}: {e}")
 
+# Loop through all files
+for f in tl_files:
+    # Proceed only if the file is a shapefile (from the codebook)
+    if cb[f]["type"] == "Shapefile":
+        print(f"\nReading {f} with ArcGIS SDF...")
+        # Get the filename and file path to disk
+        file_name = f"tl_{year}_{f}.shp"
+        file_path = os.path.join(str(tl_folder), file_name)
+        # Formulate the key for the dictionary
+        f_key = cb[f]["code2"]
 
-for name, sdf in sdfs.items():
-    # Access the spatial reference via the spatial accessor on the dataframe
-    if sdf.spatial.sr.wkid == 4269:
-        print(f"\n{name} is in NAD 1983 (EPSG:4269). Converting to Web Mercator (EPSG:3857)...")
-        sdf.spatial.project(3857, transformation_name = None)
-        print(f"  - Updated CRS WKID: {sdf.spatial.sr.wkid}")
-        # Update the dictionary with the projected dataframe
-        print(f"Updating the dictionary for {name} with the projected dataframe...")
-        sdfs[name] = sdf # Update the dictionary with the projected dataframe
+        # Import the shapefiles as a spatially enabled data frame (sdf) and add them to the spatial dictionary
+        try:
+            # Convert to spatial data frame from ArcGIS API for Python
+            sdf = GeoAccessor.from_featureclass(str(file_path))
+            
+            # Get the original reference WKID
+            ref = sdf.spatial.sr.wkid
+            
+            # Check the spatial refernce via the spatial accessor on the dataframe
+            if ref != 102100:
+                print(f"- {f_key} is not in Web Mercator (EPSG: 3857). Converting...")
+                # Converting to ESPG 3857
+                sdf.spatial.project(3857, transformation_name = None)
+                # Update the reference WKID
+                ref = sdf.spatial.sr.wkid
+                print(f"- Updated CRS WKID: {ref}")
+                print(f"- Original Shape: {sdf.shape[0]} rows x {sdf.shape[1]} cols")
+            
+            # Check method and clip to OC Extend:
+            match cb[f]["method"]:
+                case "query":
+                    # Only keep rows where the value of the field "STATEFP" is 06 and "COUNTYFP" is 059
+                    sdf = sdf[(sdf["STATEFP"] == "06") & (sdf["COUNTYFP"] == "059")]
+                case "disjoint":
+                    # Select the rows where they are inside the County Polygon
+
+            # Add the sdf data frame to the sdfs dictionary
+            sdfs[f_key] = sdf
+            
+            # Get and report the number of rows and columns, and the WKID reference code
+            print(f"- Loaded {f_key}: {sdfs[f_key].shape[0]} rows, {sdfs[f_key].shape[1]} columns")
+            print(f"- CRS WKID: {sdfs[f_key].spatial.sr.wkid}")
+
+        except Exception as e: # pylint: disable = broad-except
+            print(f"- Error Loading {f}: {e}")
+
+# Select the rows of arealm where they are inside the county polygon
+if not county.empty:
+    county_geom = county.iloc[0]['SHAPE']
+    arealm = arealm[arealm['SHAPE'].apply(lambda x: not x.disjoint(county_geom))]
+else:
+    print("Warning: County DataFrame is empty. Cannot filter arealm.")
 
 
 sdf_names = list(sdfs.keys())
@@ -325,5 +371,3 @@ faces = sdfs[f"tl_{year}_06059_faces"]
 
 # Linear Hydrography Features (OC Level)
 linearwater = sdfs[f"tl_{year}_06059_linearwater"]
-
-
