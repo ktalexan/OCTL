@@ -294,9 +294,12 @@ class OCTL:
         Notes:
             This function processes the county shapefile.
         """
+        # Initialize the spatial data frame
+        sdf_co = pd.DataFrame()
         # Get the code from the codebook
         code = self.cb["us_county"]["code"]
         print(f"\nProcessing {code} with ArcGIS SDF...")
+        print(f"- {self.cb["us_county"]["desc"]}")
         # Get the filename and file path to disk
         file_name = f"tl_{year}_us_county.shp"
         file_path = os.path.join(str(tl_folder), file_name)
@@ -315,18 +318,16 @@ class OCTL:
                 sdf_co.spatial.project(3857, transformation_name = None)
                 # Update the reference WKID
                 ref = sdf_co.spatial.sr.wkid
-                print(f"- Updated CRS WKID: {ref}")
-                print(f"- Updated Shape: {sdf_co.shape[0]} rows x {sdf_co.shape[1]} cols")
+                print(f"  - Updated CRS WKID: {ref}")
+                print(f"  - Original {code} Shape: {sdf_co.shape[0]:,} rows x {sdf_co.shape[1]} cols")
                 
                 # Only keep rows where the value of the field "STATEFP" is 06 and "COUNTYFP" is 059
+                print(f"- Querying {code}...")
                 sdf_co = sdf_co[(sdf_co["STATEFP"] == "06") & (sdf_co["COUNTYFP"] == "059")]
-
-                # Reset the index
                 sdf_co.reset_index(drop = True, inplace = True)
                 
                 # Get and report the number of rows and columns, and the WKID reference code
-                print(f"- Updated {code}: {sdf_co.shape[0]} rows, {sdf_co.shape[1]} columns")
-                print(f"- CRS WKID: {sdf_co.spatial.sr.wkid}")
+                print(f"  - Updated {code} Shape (WKID: {ref}): {sdf_co.shape[0]:,} rows, {sdf_co.shape[1]} columns")
 
         except Exception as e: # pylint: disable = broad-except
             print(f"- Error Loading {code}: {e}")
@@ -355,11 +356,14 @@ class OCTL:
         Notes:
             This function processes a file.
         """
+        # Initialize the spatial data frame
+        sdf = pd.DataFrame()
         # Check if the file is a shapefile
         if self.cb[file]["type"] == "Shapefile":
             # Get the code
             code = self.cb[file]["code"]
             print(f"\nProcessing {code} with ArcGIS SDF...")
+            print(f"- {self.cb[file]["desc"]}")
             # Get the filename and file path to disk
             file_name = f"tl_{year}_{file}.shp"
             file_path = os.path.join(str(tl_folder), file_name)
@@ -379,8 +383,8 @@ class OCTL:
                     sdf.spatial.project(3857, transformation_name = None)
                     # Update the reference WKID
                     ref = sdf.spatial.sr.wkid
-                    print(f"- Updated CRS WKID: {ref}")
-                    print(f"- Updated Shape: {sdf.shape[0]} rows x {sdf.shape[1]} cols")
+                    print(f"  - Updated CRS WKID: {ref}")
+                    print(f"  - Original {code} Shape: {sdf.shape[0]:,} rows x {sdf.shape[1]} cols")
 
                 # Check method and clip to OC Extend:
                 match self.cb[file]["method"]:
@@ -388,34 +392,31 @@ class OCTL:
                         print(f"- Querying {code}...")
                         # Only keep rows where the value of the field "STATEFP" is 06 and "COUNTYFP" is 059
                         sdf = sdf[(sdf["STATEFP"] == "06") & (sdf["COUNTYFP"] == "059")]
+                        sdf.reset_index(drop = True, inplace = True)
                     case "disjoint":
                         print(f"- Disjointing {code}...")
                         # Select the rows where they are inside the County Polygon
                         if not sdf.empty:
                             sdf = sdf[sdf['SHAPE'].apply(lambda x: not x.disjoint(county_geom))]
+                            sdf.reset_index(drop = True, inplace = True)
                         else:
                             print(f"Warning: {code} DataFrame is empty. Cannot filter.")
                     case "none":
-                        print(f"- No method specified for {code}. Skipping...")
+                        print(f"- Data specified for {code} already at the OC Extend. Skipping...")
                     case "":
                         print(f"- No method specified for {code}. Skipping...")
                     case _:
                         print(f"- Invalid method specified for {code}. Skipping...")
                         raise ValueError(f"Invalid method: {self.cb[file]['method']}")
                 
-                # Reset the index
-                if not sdf.empty:
-                    sdf.reset_index(drop = True, inplace = True)
                 
                 # Get and report the number of rows and columns, and the WKID reference code
-                print(f"- Updated Shape: {sdf.shape[0]} rows x {sdf.shape[1]} cols")
-                
-                # Get and report the number of rows and columns, and the WKID reference code
-                print(f"- Loaded {code}: {sdf.shape[0]} rows, {sdf.shape[1]} columns")
-                print(f"- CRS WKID: {sdf.spatial.sr.wkid}")
+                print(f"  - Updated {code} Shape ({ref}): {sdf.shape[0]:,} rows, {sdf.shape[1]} columns")
 
             except Exception as e: # pylint: disable = broad-except
                 print(f"- Error Loading {code}: {e}")
+        
+        # Return the shapefile
         return sdf
 
 
@@ -438,27 +439,49 @@ class OCTL:
         Notes:
             This function processes a folder of shapefiles.
         """
+        # Define an empty dictionary to hold the spatial data frames
         sdfs = {}
+
         # First, process the county shapefile to obtain the geometry
         if "us_county" in files:
             sdf_co = self.process_county(tl_folder, year)
-            # Get the county geometry
-            county_geom = sdf_co.iloc[0]['SHAPE']
-            # Drop the us_county file from the list
-            files.remove("us_county")
-            # Add the county sdf to the dictionary
-            code = self.cb["us_county"]["code2"]
-            sdfs[code] = sdf_co
+            
+            # Check if the county sdf is not empty
+            if not sdf_co.empty:
+                # Get the county geometry
+                county_geom = sdf_co.iloc[0]['SHAPE']
+                # Drop the us_county file from the list
+                files.remove("us_county")
+                # Add the county sdf to the dictionary
+                code = self.cb["us_county"]["code2"]
+                sdfs[code] = sdf_co
+                print(f"- Added {code} to the dictionary.")
+            else:
+                print("- The county spatial data frame is empty. Processing cannot continue.")
+                return sdfs
 
         # Loop through all remaining files
         for f in files:
-            # Get the county Geometry
-            county_geom = sdfs["CO"].iloc[0]['SHAPE']
-            # Process the file
-            sdf = self.process_file(year, tl_folder, f, county_geom)
-            # Add the sdf data frame to the sdfs dictionary
-            code = self.cb[f]["code2"]
-            sdfs[code] = sdf
+            # Check if the county geometry exists in the dictionary
+            if "CO" in sdfs and not sdfs["CO"].empty:
+                # Get the county Geometry
+                county_geom = sdfs["CO"].iloc[0]['SHAPE']
+                # Process the file
+                sdf = self.process_file(year, tl_folder, f, county_geom)
+            else:
+                print(f"- Skipping {f} as county geometry is not available.")
+                continue
+
+            # Add the sdf to the dictionary if it is not empty
+            if not sdf.empty:
+                # Add the sdf data frame to the sdfs dictionary
+                code = self.cb[f]["code2"]
+                sdfs[code] = sdf
+                print(f"- Added {code} to the dictionary.")
+            else:
+                print("- The processed spatial data frame is empty, and won't be added to the dictionary.")
+        
+        # Return the dictionary of shapefiles
         return sdfs
 
 
