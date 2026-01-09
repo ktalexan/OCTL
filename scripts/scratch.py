@@ -44,6 +44,13 @@ print(tl_folder)
 tl_files = list(set([f.replace(f"tl_{year}_", "").split(".")[0] for f in os.listdir(tl_folder)]))
 print(f"There are {len(tl_files)} unique files in the Tiger/Line Folder")
 
+# Temporarily process the county shapefile
+name_co = f"tl_{year}_us_county.shp"
+path_co = os.path.join(str(tl_folder), name_co)
+sdf_co = GeoAccessor.from_featureclass(path_co)
+sdf_co.spatial.project(3857, transformation_name = None)
+sdf_co = sdf_co[(sdf_co["STATEFP"] == "06") & (sdf_co["COUNTYFP"] == "059")]
+
 # Define an empty dictionary to hold the imported spatial data frames
 sdfs = {}
 
@@ -83,6 +90,20 @@ for f in tl_files:
                     sdf = sdf[(sdf["STATEFP"] == "06") & (sdf["COUNTYFP"] == "059")]
                 case "disjoint":
                     # Select the rows where they are inside the County Polygon
+                    if not sdf_co.empty:
+                        county_geom = sdf_co.iloc[0]['SHAPE']
+                        sdf = sdf[sdf['SHAPE'].apply(lambda x: not x.disjoint(county_geom))]
+                    else:
+                        print("Warning: County DataFrame is empty. Cannot filter arealm.")
+                case "none":
+                    pass
+                case "":
+                    print("No method specified. Skipping...")
+                    pass
+                case _:
+                    raise ValueError(f"Invalid method: {cb[f]['method']}")
+            
+            print(f"- Updated Shape: {sdf.shape[0]} rows x {sdf.shape[1]} cols")
 
             # Add the sdf data frame to the sdfs dictionary
             sdfs[f_key] = sdf
@@ -93,13 +114,6 @@ for f in tl_files:
 
         except Exception as e: # pylint: disable = broad-except
             print(f"- Error Loading {f}: {e}")
-
-# Select the rows of arealm where they are inside the county polygon
-if not county.empty:
-    county_geom = county.iloc[0]['SHAPE']
-    arealm = arealm[arealm['SHAPE'].apply(lambda x: not x.disjoint(county_geom))]
-else:
-    print("Warning: County DataFrame is empty. Cannot filter arealm.")
 
 
 sdf_names = list(sdfs.keys())
