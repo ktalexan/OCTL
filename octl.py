@@ -271,9 +271,195 @@ class OCTL:
 
         # Remove the year prefix, and the extension and obtain only the unique names
         tl_files = list(set([f.replace(f"tl_{year}_", "").split(".")[0] for f in os.listdir(tl_folder)]))
-        print(f"There are {len(tl_files)} unique files in the Tiger/Line Folder")
+        print(f"There are {len(tl_files)} unique files in the {year} Tiger/Line Folder")
 
         return tl_files, year
+
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ## Fx: Process County Function ----
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    def process_county(self, tl_folder: Path, year: int):
+        """
+        Process the county shapefile.
+        Args:
+            tl_folder (Path): The path to the Tiger/Line folder.
+            year (int): The year of the Tiger/Line folder.
+        Returns:
+            sdf_co (GeoDataFrame): The county shapefile as a GeoDataFrame.
+        Raises:
+            ValueError: if the Tiger/Line folder does not exist
+        Example:
+            >>> process_county(tl_folder, year)
+        Notes:
+            This function processes the county shapefile.
+        """
+        # Get the code from the codebook
+        code = self.cb["us_county"]["code"]
+        print(f"\nProcessing {code} with ArcGIS SDF...")
+        # Get the filename and file path to disk
+        file_name = f"tl_{year}_us_county.shp"
+        file_path = os.path.join(str(tl_folder), file_name)
+        # Import the shapefiles as a spatially enabled data frame (sdf) and add them to the spatial dictionary
+        try:
+            # Convert to spatial data frame from ArcGIS API for Python
+            sdf_co = GeoAccessor.from_featureclass(str(file_path))
+            
+            # Get the original reference WKID
+            ref = sdf_co.spatial.sr.wkid
+            
+            # Check the spatial refernce via the spatial accessor on the dataframe
+            if ref != 102100:
+                print(f"- {code} is not in Web Mercator (EPSG: 3857). Converting...")
+                # Converting to ESPG 3857
+                sdf_co.spatial.project(3857, transformation_name = None)
+                # Update the reference WKID
+                ref = sdf_co.spatial.sr.wkid
+                print(f"- Updated CRS WKID: {ref}")
+                print(f"- Updated Shape: {sdf_co.shape[0]} rows x {sdf_co.shape[1]} cols")
+                
+                # Only keep rows where the value of the field "STATEFP" is 06 and "COUNTYFP" is 059
+                sdf_co = sdf_co[(sdf_co["STATEFP"] == "06") & (sdf_co["COUNTYFP"] == "059")]
+
+                # Reset the index
+                sdf_co.reset_index(drop = True, inplace = True)
+                
+                # Get and report the number of rows and columns, and the WKID reference code
+                print(f"- Updated {code}: {sdf_co.shape[0]} rows, {sdf_co.shape[1]} columns")
+                print(f"- CRS WKID: {sdf_co.spatial.sr.wkid}")
+
+        except Exception as e: # pylint: disable = broad-except
+            print(f"- Error Loading {code}: {e}")
+        
+        # Return the sdf data frame
+        return sdf_co
+
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ## Fx: Process File Function ----
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    def process_file(self, year: int, tl_folder: Path, file: str, county_geom):
+        """
+        Process a file.
+        Args:
+            year (int): The year of the file.
+            tl_folder (Path): The path to the folder containing the files.
+            file (str): The file to process.
+            county_geom (Polygon): The geometry of the county.
+        Returns:
+            sdf (GeoDataFrame): The processed file.
+        Raises:
+            ValueError: if the file is not a shapefile
+        Example:
+            >>> process_file(year, tl_folder, file, county_geom)
+        Notes:
+            This function processes a file.
+        """
+        # Check if the file is a shapefile
+        if self.cb[file]["type"] == "Shapefile":
+            # Get the code
+            code = self.cb[file]["code"]
+            print(f"\nProcessing {code} with ArcGIS SDF...")
+            # Get the filename and file path to disk
+            file_name = f"tl_{year}_{file}.shp"
+            file_path = os.path.join(str(tl_folder), file_name)
+
+            # Import the shapefiles as a spatially enabled data frame (sdf) and add them to the spatial dictionary
+            try:
+                # Convert to spatial data frame from ArcGIS API for Python
+                sdf = GeoAccessor.from_featureclass(str(file_path))
+                
+                # Get the original reference WKID
+                ref = sdf.spatial.sr.wkid
+                
+                # Check the spatial refernce via the spatial accessor on the dataframe
+                if ref != 102100:
+                    print(f"- {code} is not in Web Mercator (EPSG: 3857). Converting...")
+                    # Converting to ESPG 3857
+                    sdf.spatial.project(3857, transformation_name = None)
+                    # Update the reference WKID
+                    ref = sdf.spatial.sr.wkid
+                    print(f"- Updated CRS WKID: {ref}")
+                    print(f"- Updated Shape: {sdf.shape[0]} rows x {sdf.shape[1]} cols")
+
+                # Check method and clip to OC Extend:
+                match self.cb[file]["method"]:
+                    case "query":
+                        print(f"- Querying {code}...")
+                        # Only keep rows where the value of the field "STATEFP" is 06 and "COUNTYFP" is 059
+                        sdf = sdf[(sdf["STATEFP"] == "06") & (sdf["COUNTYFP"] == "059")]
+                    case "disjoint":
+                        print(f"- Disjointing {code}...")
+                        # Select the rows where they are inside the County Polygon
+                        if not sdf.empty:
+                            sdf = sdf[sdf['SHAPE'].apply(lambda x: not x.disjoint(county_geom))]
+                        else:
+                            print(f"Warning: {code} DataFrame is empty. Cannot filter.")
+                    case "none":
+                        print(f"- No method specified for {code}. Skipping...")
+                    case "":
+                        print(f"- No method specified for {code}. Skipping...")
+                    case _:
+                        print(f"- Invalid method specified for {code}. Skipping...")
+                        raise ValueError(f"Invalid method: {self.cb[file]['method']}")
+                
+                # Reset the index
+                if not sdf.empty:
+                    sdf.reset_index(drop = True, inplace = True)
+                
+                # Get and report the number of rows and columns, and the WKID reference code
+                print(f"- Updated Shape: {sdf.shape[0]} rows x {sdf.shape[1]} cols")
+                
+                # Get and report the number of rows and columns, and the WKID reference code
+                print(f"- Loaded {code}: {sdf.shape[0]} rows, {sdf.shape[1]} columns")
+                print(f"- CRS WKID: {sdf.spatial.sr.wkid}")
+
+            except Exception as e: # pylint: disable = broad-except
+                print(f"- Error Loading {code}: {e}")
+        return sdf
+
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ## Fx: Process Folder ----
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    def process_folder(self, files: list, tl_folder: Path, year: int):
+        """
+        Process a folder of shapefiles.
+        Args:
+            files (list): List of shapefile names to process.
+            tl_folder (Path): Path to the folder containing the shapefiles.
+            year (int): Year of the shapefiles.
+        Returns:
+            sdfs (dict): Dictionary of shapefiles.
+        Raises:
+            ValueError: if the file is not a shapefile
+        Example:
+            >>> process_folder(files, tl_folder, year)
+        Notes:
+            This function processes a folder of shapefiles.
+        """
+        sdfs = {}
+        # First, process the county shapefile to obtain the geometry
+        if "us_county" in files:
+            sdf_co = self.process_county(tl_folder, year)
+            # Get the county geometry
+            county_geom = sdf_co.iloc[0]['SHAPE']
+            # Drop the us_county file from the list
+            files.remove("us_county")
+            # Add the county sdf to the dictionary
+            code = self.cb["us_county"]["code2"]
+            sdfs[code] = sdf_co
+
+        # Loop through all remaining files
+        for f in files:
+            # Get the county Geometry
+            county_geom = sdfs["CO"].iloc[0]['SHAPE']
+            # Process the file
+            sdf = self.process_file(year, tl_folder, f, county_geom)
+            # Add the sdf data frame to the sdfs dictionary
+            code = self.cb[f]["code2"]
+            sdfs[code] = sdf
+        return sdfs
 
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
