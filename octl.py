@@ -12,7 +12,10 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 import os, sys
 import json
+from pathlib import Path
 import pandas as pd
+import arcpy
+from arcgis.features import GeoAccessor, GeoSeriesAccessor
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -221,6 +224,56 @@ class OCTL:
         if not silent:
             print("\nCodebook:\n", cbdf)
         return cb, cbdf
+
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ## Fx: Get Raw Data Function ----
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    def get_raw_data(self) -> tuple:
+        """
+        Get the raw data.
+        Args:
+            Nothing
+        Returns:
+            tl_files (list): The list of raw data files.
+            year (int): The year of the raw data.
+        Raises:
+            ValueError: if there is no folder under the 'data/raw' directory
+        Example:
+            >>>tl_files, year = get_raw_data()
+        Notes:
+            This function gets the raw data from the raw data directory.
+        """ 
+        # Get the Path of the raw data directory
+        path = Path(self.prj_dirs["data_raw"])
+
+        # List only the folders of the path
+        folders = list(path.glob("tl_*"))
+
+        # Remove the "tl_" prefix from the folder names
+        folders = [f.name.replace("tl_", "") for f in folders]
+
+        # Check if there is only one folder
+        if len(folders) == 1:
+            folder_name = folders[0]
+        elif len(folders) > 1:
+            folder_name = folders
+        else:
+            raise ValueError("There should be at least one folder under the 'data/raw' directory")
+
+        # Get the year by converting the folder_name to an integer
+        year = int(folder_name)
+        print(f"Year: {year}")
+
+        # Get the folder path
+        tl_folder = Path(os.path.join(self.prj_dirs["data_raw"], f"tl_{year}"))
+        print(tl_folder)
+
+        # Remove the year prefix, and the extension and obtain only the unique names
+        tl_files = list(set([f.replace(f"tl_{year}_", "").split(".")[0] for f in os.listdir(tl_folder)]))
+        print(f"There are {len(tl_files)} unique files in the Tiger/Line Folder")
+
+        return tl_files, year
 
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
