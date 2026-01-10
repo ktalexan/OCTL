@@ -48,6 +48,9 @@ class OCTL:
         self.cb_path = os.path.join(self.prj_dirs["codebook"], "cb.json")
         self.cb, self.cbdf = self.load_cb(silent = False)
 
+        # Get the raw data
+        self.tl_data = self.get_raw_data()
+
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ## Fx: Obtain the US Congress Number ----
@@ -229,108 +232,138 @@ class OCTL:
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ## Fx: Get Raw Data Function ----
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    def get_raw_data(self) -> tuple:
+    def get_raw_data(self) -> dict:
         """
         Get the raw data.
         Args:
             Nothing
         Returns:
-            tl_files (list): The list of raw data files.
-            year (int): The year of the raw data.
+            tl_data (dict): The raw data dictionary.
         Raises:
             ValueError: if there is no folder under the 'data/raw' directory
         Example:
-            >>>tl_files, year = get_raw_data()
+            >>>tl_data = get_raw_data()
         Notes:
             This function gets the raw data from the raw data directory.
         """ 
-        # Get the Path of the raw data directory
-        path = Path(self.prj_dirs["data_raw"])
-
-        # List only the folders of the path
-        folders = list(path.glob("tl_*"))
-
-        # Remove the "tl_" prefix from the folder names
-        folders = [f.name.replace("tl_", "") for f in folders]
-
-        # Check if there is only one folder
-        if len(folders) == 1:
-            folder_name = folders[0]
-        elif len(folders) > 1:
-            folder_name = folders
-        else:
-            raise ValueError("There should be at least one folder under the 'data/raw' directory")
-
-        # Get the year by converting the folder_name to an integer
-        year = int(folder_name)
-        print(f"Year: {year}")
-
+        # Get the folder name of the raw data
+        tl_folder = [d for d in os.listdir(self.prj_dirs["data_raw"]) if os.path.isdir(os.path.join(self.prj_dirs["data_raw"], d))][0]
+        
         # Get the folder path
-        tl_folder = Path(os.path.join(self.prj_dirs["data_raw"], f"tl_{year}"))
-        print(tl_folder)
+        tl_path = os.path.join(self.prj_dirs["data_raw"], tl_folder)
+        
+        # Get the year from the folder name
+        tl_year = int(tl_folder.replace("tl_", ""))
+        print(f"Year: {tl_year}")
+        
+        # Get the raw data from the folder: Remove the year prefix, and the extension and obtain only the unique names
+        tl_files = list({f.replace(f"tl_{tl_year}_", "").split(".")[0] for f in os.listdir(tl_path)})
 
-        # Remove the year prefix, and the extension and obtain only the unique names
-        tl_files = list(set([f.replace(f"tl_{year}_", "").split(".")[0] for f in os.listdir(tl_folder)]))
-        print(f"There are {len(tl_files)} unique files in the {year} Tiger/Line Folder")
+        # Combine the obtained variables into a data dictionary
+        tl_data = {
+            "folder": tl_folder,
+            "path": tl_path,
+            "year": tl_year,
+            "files": tl_files,
+            "count": len(tl_files)
+        }
+        print(f"There are {tl_data["count"]} unique files in the {tl_data["year"]} Tiger/Line raw data folder.")
 
-        return tl_files, year
+        # Return the data dictionary
+        return tl_data
+
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ## Fx: Create Geodatabase ----
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    def create_gdb(self):
+        """
+        Create a geodatabase.
+        Args:
+            Nothing
+        Returns:
+            Nothing
+        Raises:
+            Nothing
+        Example:
+            >>>create_gdb()
+        Notes:
+            This function creates a geodatabase.
+        """
+        gdb_name = f"TL{self.tl_data["year"]}.gdb"
+        gdb_path = os.path.join(self.prj_dirs["gis"], gdb_name)
+
+        if not arcpy.Exists(gdb_path):
+            # Create a new file geodatabase
+            arcpy.management.CreateFileGDB(self.prj_dirs["gis"], gdb_name)
+            print(f"Geodatabase {gdb_name} created successfully.")
+            return gdb_name
+        else:
+            # Delete the existing geodatabase
+            arcpy.management.Delete(gdb_path)
+            # Create a new file geodatabase
+            arcpy.management.CreateFileGDB(self.prj_dirs["gis"], gdb_name)
+            print("Geodatabase already exists. Deleted and recreated.")
+            return gdb_name
 
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ## Fx: Process County Function ----
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    def process_county(self, tl_folder: Path, year: int):
+    def process_county(self):
         """
         Process the county shapefile.
         Args:
-            tl_folder (Path): The path to the Tiger/Line folder.
-            year (int): The year of the Tiger/Line folder.
+            Nothing
         Returns:
             sdf_co (GeoDataFrame): The county shapefile as a GeoDataFrame.
         Raises:
             ValueError: if the Tiger/Line folder does not exist
         Example:
-            >>> process_county(tl_folder, year)
+            >>> process_county()
         Notes:
             This function processes the county shapefile.
         """
         # Initialize the spatial data frame
         sdf_co = pd.DataFrame()
+
         # Get the code from the codebook
-        code = self.cb["us_county"]["code"]
-        print(f"\nProcessing {code} with ArcGIS SDF...")
+        code_co = self.cb["us_county"]["code"]
+        print(f"\nProcessing {code_co} with ArcGIS SDF...")
         print(f"- {self.cb["us_county"]["desc"]}")
+
         # Get the filename and file path to disk
-        file_name = f"tl_{year}_us_county.shp"
-        file_path = os.path.join(str(tl_folder), file_name)
+        file_name_co = f"tl_{self.tl_data["year"]}_us_county.shp"
+        file_path_co = os.path.join(self.tl_data["path"], file_name_co)
+
         # Import the shapefiles as a spatially enabled data frame (sdf) and add them to the spatial dictionary
         try:
             # Convert to spatial data frame from ArcGIS API for Python
-            sdf_co = GeoAccessor.from_featureclass(str(file_path))
-            
+            sdf_co = GeoAccessor.from_featureclass(str(file_path_co))
+
             # Get the original reference WKID
-            ref = sdf_co.spatial.sr.wkid
-            
+            ref_co = sdf_co.spatial.sr.wkid
+
             # Check the spatial refernce via the spatial accessor on the dataframe
-            if ref != 102100:
-                print(f"- {code} is not in Web Mercator (EPSG: 3857). Converting...")
+            if ref_co != 102100:
+                print(f"- {code_co} is not in Web Mercator (EPSG: 3857). Converting...")
                 # Converting to ESPG 3857
                 sdf_co.spatial.project(3857, transformation_name = None)
                 # Update the reference WKID
-                ref = sdf_co.spatial.sr.wkid
-                print(f"  - Updated CRS WKID: {ref}")
-                print(f"  - Original {code} Shape: {sdf_co.shape[0]:,} rows x {sdf_co.shape[1]} cols")
-                
+                ref_co = sdf_co.spatial.sr.wkid
+                print(f"  - Updated CRS WKID: {ref_co}")
+                print(f"  - Original {code_co} Shape: {sdf_co.shape[0]:,} rows x {sdf_co.shape[1]} cols")
+
                 # Only keep rows where the value of the field "STATEFP" is 06 and "COUNTYFP" is 059
-                print(f"- Querying {code}...")
+                print(f"- Querying {code_co}...")
                 sdf_co = sdf_co[(sdf_co["STATEFP"] == "06") & (sdf_co["COUNTYFP"] == "059")]
                 sdf_co.reset_index(drop = True, inplace = True)
-                
+
                 # Get and report the number of rows and columns, and the WKID reference code
-                print(f"  - Updated {code} Shape (WKID: {ref}): {sdf_co.shape[0]:,} rows, {sdf_co.shape[1]} columns")
+                print(f"  - Updated {code_co} Shape (WKID: {ref_co}): {sdf_co.shape[0]:,} rows, {sdf_co.shape[1]} columns")
 
         except Exception as e: # pylint: disable = broad-except
-            print(f"- Error Loading {code}: {e}")
+            print(f"- Error Loading {code_co}: {e}")
         
         # Return the sdf data frame
         return sdf_co
