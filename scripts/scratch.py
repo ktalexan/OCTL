@@ -17,24 +17,10 @@ prj_dirs = octl.prj_dirs
 cb = octl.cb
 cbdf = octl.cbdf
 
-
-
 # Get the raw data from the OCTL class object
 tl_files, year = octl.get_raw_data()
 
 tl_folder = Path(os.path.join(octl.prj_dirs["data_raw"], f"tl_{year}"))
-
-sdfs = octl.process_folder(tl_files, tl_folder, year)
-
-
-
-
-
-
-
-
-
-
 
 # Create a new file geodatabase
 # Define where the GDB will be stored
@@ -43,19 +29,26 @@ gdb_name = f"TL{year}.gdb"
 
 # Execute CreateFileGDB
 if not arcpy.Exists(os.path.join(out_folder_path, gdb_name)):
+    # Create a new file geodatabase
     arcpy.management.CreateFileGDB(out_folder_path, gdb_name)
     print(f"Geodatabase {gdb_name} created successfully.")
 else:
-    print("Geodatabase already exists.")
+    # Delete the existing geodatabase
+    arcpy.management.Delete(os.path.join(out_folder_path, gdb_name))
+    # Create a new file geodatabase
+    arcpy.management.CreateFileGDB(out_folder_path, gdb_name)
+    print("Geodatabase already exists. Deleted and recreated.")
 
 
-# For each spatial data frame in the sdfs dictionary, create a feature class in the geodatabase
-for sdf in sdfs:
-    sdf.to_featureclass(os.path.join(out_folder_path, gdb_name), sdf.name)
-    print(f"Feature class {sdf.name} created successfully.")
-else:
-    print("Geodatabase does not exist.")
+# Process the folder and create the spatial data frames
+sdfs = octl.process_folder(tl_files, tl_folder, year)
 
+
+# For each key and contents of the sdfs dictionary, create a feature class in the geodatabase
+for key, sdf in sdfs.items():
+    # Create a feature class in the geodatabase and replace if it already exists
+    sdf.spatial.to_featureclass(os.path.join(out_folder_path, gdb_name, key))
+    print(f"Feature class {key} created successfully.")
 
 
 

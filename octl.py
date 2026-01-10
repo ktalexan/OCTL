@@ -411,7 +411,7 @@ class OCTL:
                 
                 
                 # Get and report the number of rows and columns, and the WKID reference code
-                print(f"  - Updated {code} Shape ({ref}): {sdf.shape[0]:,} rows, {sdf.shape[1]} columns")
+                print(f"  - Updated {code} Shape ({ref}): {sdf.shape[0]:,} rows x {sdf.shape[1]} cols")
 
             except Exception as e: # pylint: disable = broad-except
                 print(f"- Error Loading {code}: {e}")
@@ -456,30 +456,27 @@ class OCTL:
                 code = self.cb["us_county"]["code2"]
                 sdfs[code] = sdf_co
                 print(f"- Added {code} to the dictionary.")
-            else:
-                print("- The county spatial data frame is empty. Processing cannot continue.")
-                return sdfs
 
         # Loop through all remaining files
         for f in files:
             # Check if the county geometry exists in the dictionary
-            if "CO" in sdfs and not sdfs["CO"].empty:
+            if "CO" in sdfs:
                 # Get the county Geometry
                 county_geom = sdfs["CO"].iloc[0]['SHAPE']
                 # Process the file
-                sdf = self.process_file(year, tl_folder, f, county_geom)
+                sdf_file = self.process_file(year, tl_folder, f, county_geom)
+                # Add the sdf to the dictionary if it contains any rows
+                if not sdf_file.empty:
+                    # Add the sdf data frame to the sdfs dictionary
+                    code = self.cb[f]["code2"]
+                    sdfs[code] = sdf_file
+                    print(f"- Added {code} to the dictionary.")
+                else:
+                    print("- The processed spatial data frame is empty, and won't be added to the dictionary.")
             else:
                 print(f"- Skipping {f} as county geometry is not available.")
                 continue
 
-            # Add the sdf to the dictionary if it is not empty
-            if not sdf.empty:
-                # Add the sdf data frame to the sdfs dictionary
-                code = self.cb[f]["code2"]
-                sdfs[code] = sdf
-                print(f"- Added {code} to the dictionary.")
-            else:
-                print("- The processed spatial data frame is empty, and won't be added to the dictionary.")
         
         # Return the dictionary of shapefiles
         return sdfs
