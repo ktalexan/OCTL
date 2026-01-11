@@ -1,9 +1,10 @@
 {
     "us_aitsn": {
+        "alias": "Tribal Subdivisions",
         "type": "Shapefile",
         "group": "Geographic Areas",
         "cat": "American Indian Area Geography",
-        "desc": "American Indian Tribal Subdivision",
+        "label": "American Indian Tribal Subdivision",
         "level": "US",
         "prefix": "us",
         "code": "AITSN",
@@ -12,10 +13,11 @@
         "method": "within"
     },
     "us_tbg": {
+        "alias": "Tribal Block Groups",
         "type": "Shapefile",
         "group": "Geographic Areas",
         "cat": "American Indian Area Geography",
-        "desc": "Tribal Block Group",
+        "label": "Tribal Block Group",
         "level": "US",
         "prefix": "us",
         "code": "TBG",
@@ -24,10 +26,11 @@
         "method": "within"
     },
     "us_ttract": {
+        "alias": "Tribal Census Tracts",
         "type": "Shapefile",
         "group": "Geographic Areas",
         "cat": "American Indian Area Geography",
-        "desc": "Tribal Census Tract",
+        "label": "Tribal Census Tract",
         "level": "US",
         "prefix": "us",
         "code": "TTRACT",
@@ -36,10 +39,11 @@
         "method": "within"
     },
     "06_tabblock20": {
+        "alias": "Blocks",
         "type": "Shapefile",
         "group": "Geographic Areas",
         "cat": "Blocks",
-        "desc": "Block",
+        "label": "Block",
         "level": "CA",
         "prefix": "06",
         "code": "TABBLOCK",
@@ -48,10 +52,11 @@
         "method": "query20"
     },
     "06_bg": {
+        "alias": "Block Groups",
         "type": "Shapefile",
         "group": "Geographic Areas",
         "cat": "Block Groups",
-        "desc": "Block Group",
+        "label": "Block Group",
         "level": "CA",
         "prefix": "06",
         "code": "BG",
@@ -60,10 +65,11 @@
         "method": "query"
     },
     "06_tract": {
+        "alias": "Census Tracts",
         "type": "Shapefile",
         "group": "Geographic Areas",
         "cat": "Census Tracts",
-        "desc": "Census Tract",
+        "label": "Census Tract",
         "level": "CA",
         "prefix": "06",
         "code": "TRACT",
@@ -72,10 +78,11 @@
         "method": "query"
     },
     "us_cd116": {
+        "alias": "Congressional Districts",
         "type": "Shapefile",
         "group": "Geographic Areas",
         "cat": "Congressional Districts",
-        "desc": "Congressional Districts of the 116th US Congress",
+        "label": "Congressional Districts of the 116th US Congress",
         "level": "US",
         "prefix": "us",
         "code": "CD116",
@@ -84,10 +91,11 @@
         "method": "within"
     },
     "06_cd118": {
+        "alias": "Congressional Districts",
         "type": "Shapefile",
         "group": "Geographic Areas",
         "cat": "Congressional Districts",
-        "desc": "Congressional Districts of the 118th US Congress",
+        "label": "Congressional Districts of the 118th US Congress",
         "level": "CA",
         "prefix": "06",
         "code": "CD118",
@@ -96,10 +104,11 @@
         "method": "within"
     },
     "06_cd119": {
+        "alias": "Congressional Districts",
         "type": "Shapefile",
         "group": "Geographic Areas",
         "cat": "Congressional Districts",
-        "desc": "Congressional Districts of the 119th US Congress",
+        "label": "Congressional Districts of the 119th US Congress",
         "level": "CA",
         "prefix": "06",
         "code": "CD119",
@@ -108,10 +117,11 @@
         "method": "within"
     },
     "us_cbsa": {
+        "alias": "Metropolitan Statistical Areas",
         "type": "Shapefile",
         "group": "Geographic Areas",
         "cat": "Core Based Statistical Areas",
-        "desc": "Metropolitan/Micropolitan Statistical Area",
+        "label": "Metropolitan/Micropolitan Statistical Area",
         "level": "US",
         "prefix": "us",
         "code": "CBSA",
@@ -120,10 +130,11 @@
         "method": "within"
     },
     "us_csa": {
+        "alias": "Combined Statistical Areas",
         "type": "Shapefile",
         "group": "Geographic Areas",
         "cat": "Core Based Statistical Areas",
-        "desc": "Combined Statistical Area",
+        "label": "Combined Statistical Area",
         "level": "US",
         "prefix": "us",
         "code": "CSA",
@@ -132,10 +143,11 @@
         "method": "within"
     },
     "us_metdiv": {
+        "alias": "Metropolitan Divisions",
         "type": "Shapefile",
         "group": "Geographic Areas",
         "cat": "Core Based Statistical Areas",
-        "desc": "Metropolitan Division",
+        "label": "Metropolitan Division",
         "level": "US",
         "prefix": "us",
         "code": "METDIV",
@@ -144,10 +156,11 @@
         "method": "within"
     },
     "us_county": {
+        "alias": "Counties",
         "type": "Shapefile",
         "group": "Geographic Areas",
         "cat": "Counties",
-        "desc": "County and Equivalent",
+        "label": "County and Equivalent",
         "level": "US",
         "prefix": "us",
         "code": "COUNTY",
@@ -156,10 +169,11 @@
         "method": "query"
     },
     "06_cousub": {
+        "alias": "County Subdivisions",
         "type": "Shapefile",
         "group": "Geographic Areas",
         "cat": "County Subdivisions",
-        "desc": "County Subdivisions",
+        "label": "County Subdivisions",
         "level": "CA",
         "prefix": "06",
         "code": "COUSUB",
@@ -168,10 +182,11 @@
         "method": "query"
     },
     "06_place": {
+        "alias": "Cities or Places",
         "type": "Shapefile",
         "group": "Geographic Areas",
         "cat": "Places",
-        "desc": "Place (Cities or Unincorporated)",
+        "label": "Place (Cities or Unincorporated)",
         "level": "CA",
         "prefix": "06",
         "code": "PLACE",
@@ -180,10 +195,11 @@
         "method": "within"
     },
     "06_puma20": {
+        "alias": "Public Use Microdata Areas",
         "type": "Shapefile",
         "group": "Geographic Areas",
         "cat": "Public Use Microdata Areas",
-        "desc": "Public Use Microdata Areas",
+        "label": "Public Use Microdata Areas",
         "level": "CA",
         "prefix": "06",
         "code": "PUMA",
@@ -192,10 +208,11 @@
         "method": "within"
     },
     "06_elsd": {
+        "alias": "Elementary School Districts",
         "type": "Shapefile",
         "group": "Geographic Areas",
         "cat": "School Districts",
-        "desc": "Elementary School Districts",
+        "label": "Elementary School Districts",
         "level": "CA",
         "prefix": "06",
         "code": "ELSD",
@@ -204,10 +221,11 @@
         "method": "within"
     },
     "06_scsd": {
+        "alias": "Secondary School Districts",
         "type": "Shapefile",
         "group": "Geographic Areas",
         "cat": "School Districts",
-        "desc": "Secondary School Districts",
+        "label": "Secondary School Districts",
         "level": "CA",
         "prefix": "06",
         "code": "SCSD",
@@ -216,10 +234,11 @@
         "method": "within"
     },
     "06_unsd": {
+        "alias": "Unified School Districts",
         "type": "Shapefile",
         "group": "Geographic Areas",
         "cat": "School Districts",
-        "desc": "Unified School Districts",
+        "label": "Unified School Districts",
         "level": "CA",
         "prefix": "06",
         "code": "UNSD",
@@ -228,10 +247,11 @@
         "method": "within"
     },
     "06_sldl": {
+        "alias": "State Assembly Legislative Districts",
         "type": "Shapefile",
         "group": "Geographic Areas",
         "cat": "State Legislative Districts",
-        "desc": "State Legislative District - Lower Chamber (Assembly)",
+        "label": "State Legislative District - Lower Chamber (Assembly)",
         "level": "CA",
         "prefix": "06",
         "code": "SLDL",
@@ -240,10 +260,11 @@
         "method": "within"
     },
     "06_sldu": {
+        "alias": "State Senate Legislative Districts",
         "type": "Shapefile",
         "group": "Geographic Areas",
         "cat": "State Legislative Districts",
-        "desc": "State Legislative District - Upper Chamber (Senate)",
+        "label": "State Legislative District - Upper Chamber (Senate)",
         "level": "CA",
         "prefix": "06",
         "code": "SLDU",
@@ -252,10 +273,11 @@
         "method": "within"
     },
     "us_uac20": {
+        "alias": "Urban Areas",
         "type": "Shapefile",
         "group": "Geographic Areas",
         "cat": "Urban Areas",
-        "desc": "Urban Areas",
+        "label": "Urban Areas",
         "level": "US",
         "prefix": "us",
         "code": "UAC",
@@ -264,10 +286,11 @@
         "method": "within"
     },
     "us_zcta520": {
+        "alias": "ZIP Code Tabulation Areas",
         "type": "Shapefile",
         "group": "Geographic Areas",
         "cat": "ZIP Code Tabulation Areas",
-        "desc": "ZIP Code Tabulation Areas",
+        "label": "ZIP Code Tabulation Areas",
         "level": "US",
         "prefix": "us",
         "code": "ZCTA",
@@ -276,10 +299,11 @@
         "method": "within"
     },
     "06059_edges": {
+        "alias": "All Lines",
         "type": "Shapefile",
         "group": "Features",
         "cat": "All Lines",
-        "desc": "All Lines",
+        "label": "All Lines",
         "level": "OC",
         "prefix": "06059",
         "code": "EDGES",
@@ -288,10 +312,11 @@
         "method": "copy"
     },
     "us_coastline": {
+        "alias": "Coastlines",
         "type": "Shapefile",
         "group": "Features",
         "cat": "Coastlines",
-        "desc": "Coastline",
+        "label": "Coastline",
         "level": "US",
         "prefix": "us",
         "code": "COASTLINE",
@@ -300,10 +325,11 @@
         "method": "clip"
     },
     "us_internationalboundary": {
+        "alias": "International Boundaries",
         "type": "Shapefile",
         "group": "Features",
         "cat": "International Boundaries",
-        "desc": "International Boundary",
+        "label": "International Boundary",
         "level": "US",
         "prefix": "us",
         "code": "INTERNATIONALBOUNDARY",
@@ -312,10 +338,11 @@
         "method": "clip"
     },
     "06_arealm": {
+        "alias": "Area Landmarks",
         "type": "Shapefile",
         "group": "Features",
         "cat": "Landmarks",
-        "desc": "Area Landmarks",
+        "label": "Area Landmarks",
         "level": "CA",
         "prefix": "06",
         "code": "AREALM",
@@ -324,10 +351,11 @@
         "method": "within"
     },
     "06_pointlm": {
+        "alias": "Point Landmarks",
         "type": "Shapefile",
         "group": "Features",
         "cat": "Landmarks",
-        "desc": "Point Landmarks",
+        "label": "Point Landmarks",
         "level": "CA",
         "prefix": "06",
         "code": "POINTLM",
@@ -336,10 +364,11 @@
         "method": "within"
     },
     "us_primaryroads": {
+        "alias": "Primary Roads",
         "type": "Shapefile",
         "group": "Features",
         "cat": "Roads",
-        "desc": "Primary Roads",
+        "label": "Primary Roads",
         "level": "US",
         "prefix": "us",
         "code": "PRIMARYROADS",
@@ -348,10 +377,11 @@
         "method": "clip"
     },
     "06_prisecroads": {
+        "alias": "Primary and Secondary Roads",
         "type": "Shapefile",
         "group": "Features",
         "cat": "Roads",
-        "desc": "Primary and Secondary Roads",
+        "label": "Primary and Secondary Roads",
         "level": "CA",
         "prefix": "06",
         "code": "PRISECROADS",
@@ -360,10 +390,11 @@
         "method": "clip"
     },
     "06059_roads": {
+        "alias": "All Roads",
         "type": "Shapefile",
         "group": "Features",
         "cat": "Roads",
-        "desc": "All Roads",
+        "label": "All Roads",
         "level": "OC",
         "prefix": "06059",
         "code": "ROADS",
@@ -372,10 +403,11 @@
         "method": "copy"
     },
     "us_rails": {
+        "alias": "Rails",
         "type": "Shapefile",
         "group": "Features",
         "cat": "Rails",
-        "desc": "Rails",
+        "label": "Rails",
         "level": "US",
         "prefix": "us",
         "code": "RAILS",
@@ -384,10 +416,11 @@
         "method": "clip"
     },
     "us_mil": {
+        "alias": "Military Installations",
         "type": "Shapefile",
         "group": "Features",
         "cat": "Military Installations",
-        "desc": "Military Installations",
+        "label": "Military Installations",
         "level": "US",
         "prefix": "us",
         "code": "MIL",
@@ -396,10 +429,11 @@
         "method": "within"
     },
     "06059_areawater": {
+        "alias": "Area Hydrography",
         "type": "Shapefile",
         "group": "Features",
         "cat": "Water",
-        "desc": "Area Hydrography",
+        "label": "Area Hydrography",
         "level": "OC",
         "prefix": "06059",
         "code": "AREAWATER",
@@ -408,10 +442,11 @@
         "method": "copy"
     },
     "06059_linearwater": {
+        "alias": "Linear Hydrography",
         "type": "Shapefile",
         "group": "Features",
         "cat": "Water",
-        "desc": "Linear Hydrography",
+        "label": "Linear Hydrography",
         "level": "OC",
         "prefix": "06059",
         "code": "LINEARWATER",
@@ -420,10 +455,11 @@
         "method": "copy"
     },
     "06059_addr": {
+        "alias": "Address Ranges",
         "type": "Table",
         "group": "Feature Relationships",
         "cat": "Relationship Files",
-        "desc": "Address Ranges Relationship File",
+        "label": "Address Ranges Relationship File",
         "level": "OC",
         "prefix": "06059",
         "code": "ADDR",
@@ -432,10 +468,11 @@
         "method": "none"
     },
     "06059_addrfeat": {
+        "alias": "Address Range Features",
         "type": "Shapefile",
         "group": "Feature Relationships",
         "cat": "Relationship Files",
-        "desc": "Address Range Feature Shapefile",
+        "label": "Address Range Feature Shapefile",
         "level": "OC",
         "prefix": "06059",
         "code": "ADDRFEAT",
@@ -444,10 +481,11 @@
         "method": "copy"
     },
     "06059_addrfn": {
+        "alias": "Address Range Feature Names",
         "type": "Table",
         "group": "Feature Relationships",
         "cat": "Relationship Files",
-        "desc": "Address Range-Feature Name Relationship File",
+        "label": "Address Range-Feature Name Relationship File",
         "level": "OC",
         "prefix": "06059",
         "code": "ADDRFN",
@@ -456,10 +494,11 @@
         "method": "none"
     },
     "06059_faces": {
+        "alias": "Topological Faces",
         "type": "Shapefile",
         "group": "Feature Relationships",
         "cat": "Relationship Files",
-        "desc": "Topological Faces (Polygons with all Geocodes) Shapefile",
+        "label": "Topological Faces (Polygons with all Geocodes) Shapefile",
         "level": "OC",
         "prefix": "06059",
         "code": "FACES",
@@ -468,10 +507,11 @@
         "method": "copy"
     },
     "06059_facesah": {
+        "alias": "Topological Faces-Area Hydrography",
         "type": "Table",
         "group": "Feature Relationships",
         "cat": "Relationship Files",
-        "desc": "Topological Faces-Area Hydrography Relationship File",
+        "label": "Topological Faces-Area Hydrography Relationship File",
         "level": "OC",
         "prefix": "06059",
         "code": "FACESAH",
@@ -480,10 +520,11 @@
         "method": "none"
     },
     "06_facesal": {
+        "alias": "Topological Faces-Area Landmark",
         "type": "Table",
         "group": "Feature Relationships",
         "cat": "Relationship Files",
-        "desc": "Topological Faces-Area Landmark Relationship File",
+        "label": "Topological Faces-Area Landmark Relationship File",
         "level": "CA",
         "prefix": "06",
         "code": "FACESAL",
@@ -492,10 +533,11 @@
         "method": "none"
     },
     "us_facesmil": {
+        "alias": "Topological Faces-Military Installations",
         "type": "Table",
         "group": "Feature Relationships",
         "cat": "Relationship Files",
-        "desc": "Topological Faces-Military Installations Relationship File",
+        "label": "Topological Faces-Military Installations Relationship File",
         "level": "US",
         "prefix": "us",
         "code": "FACESMIL",
@@ -504,10 +546,11 @@
         "method": "none"
     },
     "06059_featnames": {
+        "alias": "Feature Names",
         "type": "Table",
         "group": "Feature Relationships",
         "cat": "Relationship Files",
-        "desc": "Feature Names Relationship File",
+        "label": "Feature Names Relationship File",
         "level": "OC",
         "prefix": "06059",
         "code": "FEATNAMES",

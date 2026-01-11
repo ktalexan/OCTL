@@ -455,6 +455,8 @@ class OCTL:
                         print(f"- Deleted empty feature class: {out_fc}")
                     else:
                         final_list[code] = f
+                        # Alter the alias name of the feature class
+                        arcpy.AlterAliasName(out_fc, self.cb[f]["alias"])
                 case "copy":
                     # Copy the feature class as is
                     arcpy.management.Copy(
@@ -469,6 +471,8 @@ class OCTL:
                         print(f"- Deleted empty feature class: {out_fc}")
                     else:
                         final_list[code] = f
+                        # Alter the alias name of the feature class
+                        arcpy.AlterAliasName(out_fc, self.cb[f]["alias"])
                 case "within":
                     # Create a temporary layer (this stays in memory, not in your Pro Map)
                     arcpy.management.MakeFeatureLayer(in_fc, "temp_lyr")
@@ -496,6 +500,8 @@ class OCTL:
                         print(f"- Deleted empty feature class: {out_fc}")
                     else:
                         final_list[code] = f
+                        # Alter the alias name of the feature class
+                        arcpy.AlterAliasName(out_fc, self.cb[f]["alias"])
                 case "query":
                     # Select rows with State and County FIPS codes
                     arcpy.analysis.Select(
@@ -509,6 +515,8 @@ class OCTL:
                         print(f"- Deleted empty feature class: {out_fc}")
                     else:
                         final_list[code] = f
+                        # Alter the alias name of the feature class
+                        arcpy.AlterAliasName(out_fc, self.cb[f]["alias"])
                 case "query20":
                     # Select rows with State and County FIPS codes
                     arcpy.analysis.Select(
@@ -522,6 +530,8 @@ class OCTL:
                         print(f"- Deleted empty feature class: {out_fc}")
                     else:
                         final_list[code] = f
+                        # Alter the alias name of the feature class
+                        arcpy.AlterAliasName(out_fc, self.cb[f]["alias"])
                 case "none":
                     pass
 
@@ -547,7 +557,10 @@ class OCTL:
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     def get_metadata(self, census_year, no_congress):
         fc_metadata = {
-            "ADDR": {
+            "us_aitsn": {
+                "name"
+            }
+            "06059_addr": {
                 "name": "Address Range Relationship File",
                 "alias": f"OCTL {census_year} Address Relationship",
                 "fcname": f"octl{census_year}addr",
