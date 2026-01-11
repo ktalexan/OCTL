@@ -9,7 +9,7 @@
         "code": "AITSN",
         "code2": "TS",
         "code3": "AIT",
-        "method": "disjoint"
+        "method": "within"
     },
     "us_tbg": {
         "type": "Shapefile",
@@ -21,7 +21,7 @@
         "code": "TBG",
         "code2": "TB",
         "code3": "TBG",
-        "method": "disjoint"
+        "method": "within"
     },
     "us_ttract": {
         "type": "Shapefile",
@@ -33,7 +33,7 @@
         "code": "TTRACT",
         "code2": "TC",
         "code3": "TTR",
-        "method": "disjoint"
+        "method": "within"
     },
     "06_tabblock20": {
         "type": "Shapefile",
@@ -45,7 +45,7 @@
         "code": "TABBLOCK",
         "code2": "BL",
         "code3": "BLK",
-        "method": "query"
+        "method": "query20"
     },
     "06_bg": {
         "type": "Shapefile",
@@ -81,7 +81,7 @@
         "code": "CD116",
         "code2": "CD",
         "code3": "UCD",
-        "method": "disjoint"
+        "method": "within"
     },
     "06_cd118": {
         "type": "Shapefile",
@@ -93,7 +93,7 @@
         "code": "CD118",
         "code2": "CD",
         "code3": "UCD",
-        "method": "disjoint"
+        "method": "within"
     },
     "06_cd119": {
         "type": "Shapefile",
@@ -105,7 +105,7 @@
         "code": "CD119",
         "code2": "CD",
         "code3": "UCD",
-        "method": "disjoint"
+        "method": "within"
     },
     "us_cbsa": {
         "type": "Shapefile",
@@ -117,7 +117,7 @@
         "code": "CBSA",
         "code2": "SM",
         "code3": "CBS",
-        "method": "disjoint"
+        "method": "within"
     },
     "us_csa": {
         "type": "Shapefile",
@@ -129,7 +129,7 @@
         "code": "CSA",
         "code2": "SC",
         "code3": "CSA",
-        "method": "disjoint"
+        "method": "within"
     },
     "us_metdiv": {
         "type": "Shapefile",
@@ -141,7 +141,7 @@
         "code": "METDIV",
         "code2": "MD",
         "code3": "MDV",
-        "method": "disjoint"
+        "method": "within"
     },
     "us_county": {
         "type": "Shapefile",
@@ -177,7 +177,7 @@
         "code": "PLACE",
         "code2": "PL",
         "code3": "PLC",
-        "method": "disjoint"
+        "method": "within"
     },
     "06_puma20": {
         "type": "Shapefile",
@@ -189,7 +189,7 @@
         "code": "PUMA",
         "code2": "PU",
         "code3": "PUM",
-        "method": "disjoint"
+        "method": "within"
     },
     "06_elsd": {
         "type": "Shapefile",
@@ -201,7 +201,7 @@
         "code": "ELSD",
         "code2": "SE",
         "code3": "SDE",
-        "method": "disjoint"
+        "method": "within"
     },
     "06_scsd": {
         "type": "Shapefile",
@@ -213,7 +213,7 @@
         "code": "SCSD",
         "code2": "SS",
         "code3": "SDS",
-        "method": "disjoint"
+        "method": "within"
     },
     "06_unsd": {
         "type": "Shapefile",
@@ -225,7 +225,7 @@
         "code": "UNSD",
         "code2": "SU",
         "code3": "SDU",
-        "method": "disjoint"
+        "method": "within"
     },
     "06_sldl": {
         "type": "Shapefile",
@@ -237,7 +237,7 @@
         "code": "SLDL",
         "code2": "LL",
         "code3": "LDL",
-        "method": "disjoint"
+        "method": "within"
     },
     "06_sldu": {
         "type": "Shapefile",
@@ -249,7 +249,7 @@
         "code": "SLDU",
         "code2": "LU",
         "code3": "LDU",
-        "method": "disjoint"
+        "method": "within"
     },
     "us_uac20": {
         "type": "Shapefile",
@@ -261,7 +261,7 @@
         "code": "UAC",
         "code2": "UA",
         "code3": "UAC",
-        "method": "disjoint"
+        "method": "within"
     },
     "us_zcta520": {
         "type": "Shapefile",
@@ -273,7 +273,7 @@
         "code": "ZCTA",
         "code2": "ZC",
         "code3": "ZCT",
-        "method": "disjoint"
+        "method": "within"
     },
     "06059_edges": {
         "type": "Shapefile",
@@ -285,7 +285,7 @@
         "code": "EDGES",
         "code2": "ED",
         "code3": "EDG",
-        "method": "none"
+        "method": "copy"
     },
     "us_coastline": {
         "type": "Shapefile",
@@ -297,7 +297,7 @@
         "code": "COASTLINE",
         "code2": "CL",
         "code3": "CSL",
-        "method": "disjoint"
+        "method": "clip"
     },
     "us_internationalboundary": {
         "type": "Shapefile",
@@ -309,7 +309,7 @@
         "code": "INTERNATIONALBOUNDARY",
         "code2": "IB",
         "code3": "INB",
-        "method": "disjoint"
+        "method": "clip"
     },
     "06_arealm": {
         "type": "Shapefile",
@@ -321,7 +321,7 @@
         "code": "AREALM",
         "code2": "LA",
         "code3": "LMA",
-        "method": "disjoint"
+        "method": "within"
     },
     "06_pointlm": {
         "type": "Shapefile",
@@ -333,7 +333,7 @@
         "code": "POINTLM",
         "code2": "LP",
         "code3": "LMP",
-        "method": "disjoint"
+        "method": "within"
     },
     "us_primaryroads": {
         "type": "Shapefile",
@@ -345,7 +345,7 @@
         "code": "PRIMARYROADS",
         "code2": "RP",
         "code3": "RPR",
-        "method": "disjoint"
+        "method": "clip"
     },
     "06_prisecroads": {
         "type": "Shapefile",
@@ -357,7 +357,7 @@
         "code": "PRISECROADS",
         "code2": "RS",
         "code3": "RPS",
-        "method": "disjoint"
+        "method": "clip"
     },
     "06059_roads": {
         "type": "Shapefile",
@@ -369,7 +369,7 @@
         "code": "ROADS",
         "code2": "RD",
         "code3": "RDS",
-        "method": "none"
+        "method": "copy"
     },
     "us_rails": {
         "type": "Shapefile",
@@ -381,7 +381,7 @@
         "code": "RAILS",
         "code2": "RL",
         "code3": "RLS",
-        "method": "disjoint"
+        "method": "clip"
     },
     "us_mil": {
         "type": "Shapefile",
@@ -393,7 +393,7 @@
         "code": "MIL",
         "code2": "ML",
         "code3": "MIL",
-        "method": "disjoint"
+        "method": "within"
     },
     "06059_areawater": {
         "type": "Shapefile",
@@ -405,7 +405,7 @@
         "code": "AREAWATER",
         "code2": "WA",
         "code3": "WTA",
-        "method": "none"
+        "method": "copy"
     },
     "06059_linearwater": {
         "type": "Shapefile",
@@ -417,7 +417,7 @@
         "code": "LINEARWATER",
         "code2": "WL",
         "code3": "WTL",
-        "method": "none"
+        "method": "copy"
     },
     "06059_addr": {
         "type": "Table",
@@ -441,7 +441,7 @@
         "code": "ADDRFEAT",
         "code2": "AF",
         "code3": "ADF",
-        "method": "none"
+        "method": "copy"
     },
     "06059_addrfn": {
         "type": "Table",
@@ -465,7 +465,7 @@
         "code": "FACES",
         "code2": "FC",
         "code3": "FAC",
-        "method": "none"
+        "method": "copy"
     },
     "06059_facesah": {
         "type": "Table",
@@ -489,7 +489,7 @@
         "code": "FACESAL",
         "code2": "FL",
         "code3": "FAL",
-        "method": ""
+        "method": "none"
     },
     "us_facesmil": {
         "type": "Table",
@@ -501,7 +501,7 @@
         "code": "FACESMIL",
         "code2": "FM",
         "code3": "FAM",
-        "method": ""
+        "method": "none"
     },
     "06059_featnames": {
         "type": "Table",

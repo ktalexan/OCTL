@@ -86,7 +86,7 @@ class OCTL:
             2022: 118,
             2023: 118,
             2024: 119,
-            2025: 119,
+            2025: 119
         }
 
         # Get the Congress number from the dictionary
@@ -257,7 +257,7 @@ class OCTL:
         print(f"Year: {tl_year}")
         
         # Get the raw data from the folder: Remove the year prefix, and the extension and obtain only the unique names
-        tl_files = list({f.replace(f"tl_{tl_year}_", "").split(".")[0] for f in os.listdir(tl_path)})
+        tl_files = sorted(list({f.replace(f"tl_{tl_year}_", "").split(".")[0] for f in os.listdir(tl_path)}))
 
         # Combine the obtained variables into a data dictionary
         tl_data = {
@@ -271,6 +271,46 @@ class OCTL:
 
         # Return the data dictionary
         return tl_data
+
+
+    def scratch_gdb(self, method: str = "create"):
+        """
+        Create a scratch geodatabase.
+        Args:
+            method (str): The method to use. Default is "create".
+        Returns:
+            gdb_path (str): The path to the scratch geodatabase.
+        Raises:
+            Nothing
+        Example:
+            >>>scratch_gdb(method = "create")
+        Notes:
+            This function creates a scratch geodatabase.
+        """
+        # Get the path to the scratch geodatabase
+        gdb_path = os.path.join(self.prj_dirs["gis"], "scratch.gdb")
+
+        if method == "create":
+            # Check if the geodatabase exists
+            if arcpy.Exists(gdb_path):
+                # Delete the geodatabase
+                arcpy.management.Delete(gdb_path)
+                print("Scratch geodatabase deleted successfully.")
+            # Create a scratch geodatabase
+            arcpy.management.CreateFileGDB(self.prj_dirs["gis"], "scratch.gdb")
+            print("Scratch geodatabase created successfully.")
+        elif method == "delete":
+            if not arcpy.Exists(gdb_path):
+                print("Scratch geodatabase does not exist.")
+                return
+            # Delete the scratch geodatabase
+            arcpy.management.Delete(gdb_path)
+            print("Scratch geodatabase deleted successfully.")
+        else:
+            print("Invalid method. Please choose 'create' or 'delete'.")
+        
+        # Return the path to the scratch geodatabase
+        return gdb_path
 
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -297,222 +337,209 @@ class OCTL:
             # Create a new file geodatabase
             arcpy.management.CreateFileGDB(self.prj_dirs["gis"], gdb_name)
             print(f"Geodatabase {gdb_name} created successfully.")
-            return gdb_name
+            return gdb_path
         else:
             # Delete the existing geodatabase
             arcpy.management.Delete(gdb_path)
             # Create a new file geodatabase
             arcpy.management.CreateFileGDB(self.prj_dirs["gis"], gdb_name)
             print("Geodatabase already exists. Deleted and recreated.")
-            return gdb_name
+            return gdb_path
 
 
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    ## Fx: Process County Function ----
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    def process_county(self):
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ## Fx: Process Shapefiles ----
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    def process_shapefiles(self) -> dict:
         """
-        Process the county shapefile.
+        Process shapefiles from the raw data directory and create a geodatabase.
         Args:
             Nothing
         Returns:
-            sdf_co (GeoDataFrame): The county shapefile as a GeoDataFrame.
+            final_list (dict): A dictionary of feature classes and their codes.
         Raises:
-            ValueError: if the Tiger/Line folder does not exist
+            Nothing
         Example:
-            >>> process_county()
+            >>>process_shapefiles()
         Notes:
-            This function processes the county shapefile.
+            This function processes shapefiles from the raw data directory and creates a geodatabase.
         """
-        # Initialize the spatial data frame
-        sdf_co = pd.DataFrame()
+        # Get the raw data from the OCTL class object
+        tl_data = self.tl_data
 
-        # Get the code from the codebook
-        code_co = self.cb["us_county"]["code"]
-        print(f"\nProcessing {code_co} with ArcGIS SDF...")
-        print(f"- {self.cb["us_county"]["desc"]}")
+        # Create a scratch geodatabase
+        scratch_gdb = self.scratch_gdb(method = "create")
 
-        # Get the filename and file path to disk
-        file_name_co = f"tl_{self.tl_data["year"]}_us_county.shp"
-        file_path_co = os.path.join(self.tl_data["path"], file_name_co)
+        # Set environment workspace to the folder containing shapefiles
+        arcpy.env.workspace = tl_data["path"]
 
-        # Import the shapefiles as a spatially enabled data frame (sdf) and add them to the spatial dictionary
+        # Get a list of all shapefiles in the folder
+        shapefiles = arcpy.ListFeatureClasses("*.shp")
+        tables = arcpy.ListTables("*.dbf")
+
+        if shapefiles:
+            # FeatureClassToGeodatabase accepts a list of inputs
+            arcpy.conversion.FeatureClassToGeodatabase(shapefiles, scratch_gdb)
+            print(f"\nSuccessfully imported {len(shapefiles)} shapefiles to {scratch_gdb}\n")
+        else:
+            print("No shapefiles found in the specified directory.")
+
+        if tables:
+            # FeatureClassToGeodatabase accepts a list of inputs
+            arcpy.conversion.TableToGeodatabase(tables, scratch_gdb)
+            print(f"\nSuccessfully imported {len(tables)} tables to {scratch_gdb}\n")
+        else:
+            print("No tables found in the specified directory.")
+
         try:
-            # Convert to spatial data frame from ArcGIS API for Python
-            sdf_co = GeoAccessor.from_featureclass(str(file_path_co))
+            # Set environment workspace to the scratch geodatabase
+            arcpy.env.workspace = scratch_gdb
 
-            # Get the original reference WKID
-            ref_co = sdf_co.spatial.sr.wkid
+            # List of all feature classes in the scratch geodatabase
+            scratch_fcs = arcpy.ListFeatureClasses()
+            #scratch_tbls = arcpy.ListTables()
+        finally:
+            # Set environment workspace to the current working directory
+            arcpy.env.workspace = os.getcwd()
 
-            # Check the spatial refernce via the spatial accessor on the dataframe
-            if ref_co != 102100:
-                print(f"- {code_co} is not in Web Mercator (EPSG: 3857). Converting...")
-                # Converting to ESPG 3857
-                sdf_co.spatial.project(3857, transformation_name = None)
-                # Update the reference WKID
-                ref_co = sdf_co.spatial.sr.wkid
-                print(f"  - Updated CRS WKID: {ref_co}")
-                print(f"  - Original {code_co} Shape: {sdf_co.shape[0]:,} rows x {sdf_co.shape[1]} cols")
+        # Create a geodatabase for the year
+        tl_gdb = self.create_gdb()
 
-                # Only keep rows where the value of the field "STATEFP" is 06 and "COUNTYFP" is 059
-                print(f"- Querying {code_co}...")
-                sdf_co = sdf_co[(sdf_co["STATEFP"] == "06") & (sdf_co["COUNTYFP"] == "059")]
-                sdf_co.reset_index(drop = True, inplace = True)
+        # Define the input and output feature classes for the county feature class
+        in_oc = os.path.join(scratch_gdb, f"tl_{tl_data["year"]}_us_county")
+        out_oc = os.path.join(tl_gdb, self.cb["us_county"]["code2"])
 
-                # Get and report the number of rows and columns, and the WKID reference code
-                print(f"  - Updated {code_co} Shape (WKID: {ref_co}): {sdf_co.shape[0]:,} rows, {sdf_co.shape[1]} columns")
+        # Select rows with State and County FIPS codes
+        arcpy.analysis.Select(
+            in_features = in_oc,
+            out_feature_class = out_oc,
+            where_clause = "STATEFP = '06' And COUNTYFP = '059'"
+        )
+        # Check if the output feature class is empty
+        if int(arcpy.GetCount_management(out_oc).getOutput(0)) == 0:
+            arcpy.management.Delete(out_oc)
 
-        except Exception as e: # pylint: disable = broad-except
-            print(f"- Error Loading {code_co}: {e}")
+        # Create a list to store the final feature classes
+        final_list = dict()
+
+        # Create a list of feature classes to process and remove the us_county feature class
+        fc_list = [f.replace(f"tl_{tl_data["year"]}_", "") for f in scratch_fcs]
+        fc_list.remove("us_county")
+        final_list["CO"] = "us_county"
+
+
+        # Loop through the feature classes in the fc_list
+        for f in fc_list:
+            # Define the feature class name and code from the codebook
+            fc = f"tl_{tl_data["year"]}_{f}"
+            code = self.cb[f]["code2"]
+            # Define the input and output feature classes
+            in_fc = os.path.join(scratch_gdb, fc)
+            out_fc = os.path.join(tl_gdb, code)
+            method = self.cb[f]["method"]
+            print(f"Processing {fc}...")
+
+            # Match the method for executing geoprocessing operations
+            match method:
+                case "clip":
+                    # Clip the feature class to the extent of the county
+                    arcpy.analysis.Clip(
+                        in_features = in_fc,
+                        clip_features = out_oc,
+                        out_feature_class = out_fc,
+                        cluster_tolerance = None
+                    )
+                    # Check if the output feature class is empty
+                    if int(arcpy.GetCount_management(out_fc).getOutput(0)) == 0:
+                        arcpy.management.Delete(out_fc)
+                        print(f"- Deleted empty feature class: {out_fc}")
+                    else:
+                        final_list[code] = f
+                case "copy":
+                    # Copy the feature class as is
+                    arcpy.management.Copy(
+                        in_data = in_fc,
+                        out_data = out_fc,
+                        data_type = "FeatureClass",
+                        associated_data = None
+                    )
+                    # Check if the output feature class is empty
+                    if int(arcpy.GetCount_management(out_fc).getOutput(0)) == 0:
+                        arcpy.management.Delete(out_fc)
+                        print(f"- Deleted empty feature class: {out_fc}")
+                    else:
+                        final_list[code] = f
+                case "within":
+                    # Create a temporary layer (this stays in memory, not in your Pro Map)
+                    arcpy.management.MakeFeatureLayer(in_fc, "temp_lyr")
+                    # Check if the temp_lyr is empty
+                    if arcpy.management.GetCount("temp_lyr") == 0:
+                        arcpy.management.Delete("temp_lyr")
+                        print(f"- Deleted empty feature class: {out_fc}")
+                        continue
+                    # Apply your spatial selection with the negative distance
+                    arcpy.management.SelectLayerByLocation(
+                        in_layer = "temp_lyr",
+                        overlap_type = "WITHIN_A_DISTANCE",
+                        select_features = out_oc,
+                        search_distance = "-1000 Feet",
+                        selection_type = "NEW_SELECTION",
+                        invert_spatial_relationship = "NOT_INVERT"
+                    )
+                    # Export the selection to a new fc
+                    arcpy.conversion.FeatureClassToFeatureClass("temp_lyr", tl_gdb, code)
+                    # Delete the temporary layer
+                    arcpy.management.Delete("temp_lyr")
+                    # Check if the output feature class is empty
+                    if int(arcpy.GetCount_management(out_fc).getOutput(0)) == 0:
+                        arcpy.management.Delete(out_fc)
+                        print(f"- Deleted empty feature class: {out_fc}")
+                    else:
+                        final_list[code] = f
+                case "query":
+                    # Select rows with State and County FIPS codes
+                    arcpy.analysis.Select(
+                        in_features = in_fc,
+                        out_feature_class = out_fc,
+                        where_clause = "STATEFP = '06' And COUNTYFP = '059'"
+                    )
+                    # Check if the output feature class is empty
+                    if int(arcpy.GetCount_management(out_fc).getOutput(0)) == 0:
+                        arcpy.management.Delete(out_fc)
+                        print(f"- Deleted empty feature class: {out_fc}")
+                    else:
+                        final_list[code] = f
+                case "query20":
+                    # Select rows with State and County FIPS codes
+                    arcpy.analysis.Select(
+                        in_features = in_fc,
+                        out_feature_class = out_fc,
+                        where_clause = "STATEFP20 = '06' And COUNTYFP20 = '059'"
+                    )
+                    # Check if the output feature class is empty
+                    if int(arcpy.GetCount_management(out_fc).getOutput(0)) == 0:
+                        arcpy.management.Delete(out_fc)
+                        print(f"- Deleted empty feature class: {out_fc}")
+                    else:
+                        final_list[code] = f
+                case "none":
+                    pass
+
+        # Get a list of all feature classes in the TL geodatabase
+        try:
+            arcpy.env.workspace = tl_gdb
+            tl_fcs = arcpy.ListFeatureClasses()
+        finally:
+            arcpy.env.workspace = os.getcwd()
         
-        # Return the sdf data frame
-        return sdf_co
+        # Delete the scratch geodatabase
+        self.scratch_gdb(method = "delete")
 
+        # Print the list of feature classes in the TL geodatabase
+        print(f"\nSuccessfully processed shapefiles:\n{tl_fcs}")
 
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    ## Fx: Process File Function ----
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    def process_file(self, year: int, tl_folder: Path, file: str, county_geom):
-        """
-        Process a file.
-        Args:
-            year (int): The year of the file.
-            tl_folder (Path): The path to the folder containing the files.
-            file (str): The file to process.
-            county_geom (Polygon): The geometry of the county.
-        Returns:
-            sdf (GeoDataFrame): The processed file.
-        Raises:
-            ValueError: if the file is not a shapefile
-        Example:
-            >>> process_file(year, tl_folder, file, county_geom)
-        Notes:
-            This function processes a file.
-        """
-        # Initialize the spatial data frame
-        sdf = pd.DataFrame()
-        # Check if the file is a shapefile
-        if self.cb[file]["type"] == "Shapefile":
-            # Get the code
-            code = self.cb[file]["code"]
-            print(f"\nProcessing {code} with ArcGIS SDF...")
-            print(f"- {self.cb[file]["desc"]}")
-            # Get the filename and file path to disk
-            file_name = f"tl_{year}_{file}.shp"
-            file_path = os.path.join(str(tl_folder), file_name)
-
-            # Import the shapefiles as a spatially enabled data frame (sdf) and add them to the spatial dictionary
-            try:
-                # Convert to spatial data frame from ArcGIS API for Python
-                sdf = GeoAccessor.from_featureclass(str(file_path))
-                
-                # Get the original reference WKID
-                ref = sdf.spatial.sr.wkid
-                
-                # Check the spatial refernce via the spatial accessor on the dataframe
-                if ref != 102100:
-                    print(f"- {code} is not in Web Mercator (EPSG: 3857). Converting...")
-                    # Converting to ESPG 3857
-                    sdf.spatial.project(3857, transformation_name = None)
-                    # Update the reference WKID
-                    ref = sdf.spatial.sr.wkid
-                    print(f"  - Updated CRS WKID: {ref}")
-                    print(f"  - Original {code} Shape: {sdf.shape[0]:,} rows x {sdf.shape[1]} cols")
-
-                # Check method and clip to OC Extend:
-                match self.cb[file]["method"]:
-                    case "query":
-                        print(f"- Querying {code}...")
-                        # Only keep rows where the value of the field "STATEFP" is 06 and "COUNTYFP" is 059
-                        sdf = sdf[(sdf["STATEFP"] == "06") & (sdf["COUNTYFP"] == "059")]
-                        sdf.reset_index(drop = True, inplace = True)
-                    case "disjoint":
-                        print(f"- Disjointing {code}...")
-                        # Select the rows where they are inside the County Polygon
-                        if not sdf.empty:
-                            sdf = sdf[sdf['SHAPE'].apply(lambda x: not x.disjoint(county_geom))]
-                            sdf.reset_index(drop = True, inplace = True)
-                        else:
-                            print(f"Warning: {code} DataFrame is empty. Cannot filter.")
-                    case "none":
-                        print(f"- Data specified for {code} already at the OC Extend. Skipping...")
-                    case "":
-                        print(f"- No method specified for {code}. Skipping...")
-                    case _:
-                        print(f"- Invalid method specified for {code}. Skipping...")
-                        raise ValueError(f"Invalid method: {self.cb[file]['method']}")
-                
-                
-                # Get and report the number of rows and columns, and the WKID reference code
-                print(f"  - Updated {code} Shape ({ref}): {sdf.shape[0]:,} rows x {sdf.shape[1]} cols")
-
-            except Exception as e: # pylint: disable = broad-except
-                print(f"- Error Loading {code}: {e}")
-        
-        # Return the shapefile
-        return sdf
-
-
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    ## Fx: Process Folder ----
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    def process_folder(self, files: list, tl_folder: Path, year: int):
-        """
-        Process a folder of shapefiles.
-        Args:
-            files (list): List of shapefile names to process.
-            tl_folder (Path): Path to the folder containing the shapefiles.
-            year (int): Year of the shapefiles.
-        Returns:
-            sdfs (dict): Dictionary of shapefiles.
-        Raises:
-            ValueError: if the file is not a shapefile
-        Example:
-            >>> process_folder(files, tl_folder, year)
-        Notes:
-            This function processes a folder of shapefiles.
-        """
-        # Define an empty dictionary to hold the spatial data frames
-        sdfs = {}
-
-        # First, process the county shapefile to obtain the geometry
-        if "us_county" in files:
-            sdf_co = self.process_county(tl_folder, year)
-            
-            # Check if the county sdf is not empty
-            if not sdf_co.empty:
-                # Get the county geometry
-                county_geom = sdf_co.iloc[0]['SHAPE']
-                # Drop the us_county file from the list
-                files.remove("us_county")
-                # Add the county sdf to the dictionary
-                code = self.cb["us_county"]["code2"]
-                sdfs[code] = sdf_co
-                print(f"- Added {code} to the dictionary.")
-
-        # Loop through all remaining files
-        for f in files:
-            # Check if the county geometry exists in the dictionary
-            if "CO" in sdfs:
-                # Get the county Geometry
-                county_geom = sdfs["CO"].iloc[0]['SHAPE']
-                # Process the file
-                sdf_file = self.process_file(year, tl_folder, f, county_geom)
-                # Add the sdf to the dictionary if it contains any rows
-                if not sdf_file.empty:
-                    # Add the sdf data frame to the sdfs dictionary
-                    code = self.cb[f]["code2"]
-                    sdfs[code] = sdf_file
-                    print(f"- Added {code} to the dictionary.")
-                else:
-                    print("- The processed spatial data frame is empty, and won't be added to the dictionary.")
-            else:
-                print(f"- Skipping {f} as county geometry is not available.")
-                continue
-
-        
-        # Return the dictionary of shapefiles
-        return sdfs
+        # Return the list of feature classes in the TL geodatabase
+        return final_list
 
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
