@@ -31,29 +31,3 @@ tl_data = octl.tl_data
 
 # Process the shapefiles and get the dictionary of feature classes and codes
 tl_dict = octl.process_shapefiles()
-
-
-
-
-list(cb.keys())
-
-
-scratch_query_fcs = [f for f in scratch_fcs if cb[f.replace(f"tl_{tl_data['year']}_", "").replace(".shp", "")]["method"] == "query"]
-
-for fc in scratch_query_fcs:
-    code2 = cb[fc.replace(f"tl_{tl_data['year']}_", "").replace(".shp", "")]["code2"]
-    arcpy.analysis.Select(
-            in_features = os.path.join(scratch_gdb, fc),
-            out_feature_class = os.path.join(tl_gdb, code2),
-        where_clause = "STATEFP = '06' And COUNTYFP = '059'"
-    )
-
-arcpy.management.Copy(
-    in_data=os.path.join(scratch_gdb, fc),
-    out_data=os.path.join(tl_gdb, code),
-    data_type="FeatureClass",
-    associated_data=None
-)
-
-
-arcpy.ListFeatureClasses(tl_gdb)
