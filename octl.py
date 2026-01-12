@@ -796,16 +796,16 @@ class OCTL:
             },
             "us_aitsn": {
                 "abbrev": "AITSN",
-                "alias": f"OCTL {tl_data['year']} Tribal Subdivisions",
+                "alias": f"OCTL {self.tl_data["year"]} Tribal Subdivisions",
                 "type": "Feature Class",
                 "fcname": "TS",
                 "group": "Geographic Areas",
                 "category": "American Indian Area Geography",
                 "label": "American Indian Tribal Subdivision",
-                "title": f"OCTL {tl_data['year']} Tribal Subdivisions Feature Class",
+                "title": f"OCTL {self.tl_data["year"]} Tribal Subdivisions Feature Class",
                 "tags": "Orange County, California, OCTL, TigerLines, Tribal Subdivisions, American Indian Area Geography",
-                "summary": f"Orange County Tiger Lines {tl_data['year']} Tribal Subdivisions Feature Class",
-                "description": f"Orange County Tiger Lines {tl_data['year']} Tribal Subdivisions Feature Class",
+                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} Tribal Subdivisions Feature Class",
+                "description": f"Orange County Tiger Lines {self.tl_data["year"]} Tribal Subdivisions Feature Class",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/20c4b722b7d84db3a4e163fc0ce11102/data",
@@ -1126,7 +1126,7 @@ class OCTL:
         # Loop through the feature classes in the fc_list
         for f in fc_list:
             # Define the feature class name and code from the codebook
-            fc = f"tl_{tl_data["year"]}_{f}"
+            fc = f"tl_{self.tl_data["year"]}_{f}"
             code = self.cb[f]["code2"]
             # Define the input and output feature classes
             in_fc = os.path.join(scratch_gdb, fc)
@@ -1229,11 +1229,20 @@ class OCTL:
                         arcpy.AlterAliasName(out_fc, self.cb[f]["alias"])
                 case "none":
                     pass
-            
-            print(f"\nApplying metadata to {out_fc}")
+        
+        # Get a list of all feature classes in the TL geodatabase
+        try:
+            arcpy.env.workspace = tl_gdb
+            tl_fcs = arcpy.ListFeatureClasses()
+        finally:
+            arcpy.env.workspace = os.getcwd()
+        
+        # Apply metadata to the TL geodatabase
+        print(f"\nApplying metadata to the TL geodatabase: {tl_gdb}")
+        for fc in tl_fcs:
             # Define the feature class metadata
-            fc_md = md_dict[f]
-            mdo = md.metadata()
+            fc_md = md_dict[final_list[fc]]
+            mdo = md.Metadata()
             mdo.title = fc_md["title"]
             mdo.tags = fc_md["tags"]
             mdo.summary = fc_md["summary"]
@@ -1243,30 +1252,34 @@ class OCTL:
             mdo.thumbnailUri = fc_md["uri"]
 
             # Apply the metadata to the feature class
-            md_fc = md.metadata(out_fc)
+            md_fc = md.Metadata(tl_gdb)
             if not md_fc.isReadOnly:
                 md_fc.copy(mdo)
                 md_fc.save()
-                print(f"- Metadata applied to {out_fc}")
+                print(f"- Metadata applied to {final_list[fc]} ({fc})")
             else:
-                print(f"- Metadata is read-only for {out_fc}")
-
-        # Get a list of all feature classes in the TL geodatabase
-        try:
-            arcpy.env.workspace = tl_gdb
-            tl_fcs = arcpy.ListFeatureClasses()
-        finally:
-            arcpy.env.workspace = os.getcwd()
+                print(f"- Metadata is read-only for {final_list[fc]} ({fc})")
         
         # Delete the scratch geodatabase
         self.scratch_gdb(method = "delete")
+
+        # Create a metadata object for the TL geodatabase
+        print(f"\nApplying metadata to the TL geodatabase:{tl_gdb}")
+        md_gdb = md.Metadata(tl_gdb)
+        md_gdb.title = f"TL{self.tl_data["year"]} TigerLine Geodatabase"
+        md_gdb.tags = "Orange County, California, OCTL, TigerLine, Geodatabase"
+        md_gdb.summary = f"Orange County TigerLine Geodatabase for the {self.tl_data["year"]} year data"
+        md_gdb.description = f"Orange County TigerLine Geodatabase for the {self.tl_data["year"]} year data. The data contains feature classes for all TigerLine data available for Orange County, California."
+        md_gdb.credits = "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services"
+        md_gdb.accessConstraints = """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>"""
+        md_gdb.thumbnailUri = "https://ocpw.maps.arcgis.com/sharing/rest/content/items/20c4b722b7d84db3a4e163fc0ce11102/data"
+        md_gdb.save()
 
         # Print the list of feature classes in the TL geodatabase
         print(f"\nSuccessfully processed shapefiles:\n{tl_fcs}")
 
         # Return the list of feature classes in the TL geodatabase
         return final_list
-
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

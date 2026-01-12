@@ -4,6 +4,7 @@ from pathlib import Path
 import shutil
 import pandas as pd
 import arcpy
+from arcpy import metadata as md
 from arcgis.features import GeoAccessor, GeoSeriesAccessor
 from octl import OCTL
 
