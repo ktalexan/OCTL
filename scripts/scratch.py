@@ -16,7 +16,7 @@ arcpy.env.workspace = os.getcwd()
 arcpy.env.overwriteOutput = True
 
 # Initialize the OCTL class object
-octl = yieldOCTL(part = 0, version = 2026.1)
+octl = OCTL(part = 0, version = 2026.1)
 
 # Get the project metadata and directories from the OCTL class object
 prj_meta = octl.prj_meta
@@ -24,7 +24,8 @@ prj_dirs = octl.prj_dirs
 
 # Get the codebook from the OCTL class object
 cb = octl.cb
-cbdf = octl.cbdf
-
+cb_df = octl.cb_df
+    
 # Get the raw data
 tl_data = octl.tl_data
+

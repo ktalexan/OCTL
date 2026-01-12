@@ -51,7 +51,7 @@ prj_dirs = octl.prj_dirs
 
 # Get the codebook from the OCTL class object
 cb = octl.cb
-cbdf = octl.cbdf
+cbdf = octl.cb_df
 
 # Get the raw data
 tl_data = octl.tl_data
