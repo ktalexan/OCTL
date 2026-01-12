@@ -19,10 +19,14 @@ print("\n1. Preliminaries\n")
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 print("\n1.1. Referencing Libraries and Initialization\n")
 
-import os, datetime
+# Import necessary libraries
+import os, sys, datetime
+from pathlib import Path
+import shutil
+import pandas as pd
 import arcpy
 from arcpy import metadata as md
-from arcpy import env
+from arcgis.features import GeoAccessor, GeoSeriesAccessor
 from octl import OCTL
 
 
@@ -31,41 +35,32 @@ from octl import OCTL
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 print("\n1.2. Basic Definitions\n")
 
-# Main project path
-prj_path = os.path.split(arcpy.env.workspace)[0]
-print("\nMain project path: ", prj_path)
+# Set pandas options
+pd.options.mode.copy_on_write = True
 
-# Main project geodatabase
-gdb_main = "octlAgp.gdb"
-gdb_main_path = os.path.join(prj_path, gdb_main)
-print("\nMain project geodatabase: ", gdb_main_path)
+# Set environment workspace to the current working directory
+arcpy.env.workspace = os.getcwd()
+arcpy.env.overwriteOutput = True
 
-# List of project years
-year_list = [*range(2010, 2025, 1)]
-print("\nList of project years: ", year_list)
+# Initialize the OCTL class object
+octl = OCTL(part = 0, version = 2026.1)
 
-# Geodatabase name list construction from years
-gdb_list = [f"octl{y}.gdb" for y in year_list]
-gdb_path_list = [os.path.join(prj_path, f"octl{y}.gdb") for y in year_list]
-print(gdb_path_list)
+# Get the project metadata and directories from the OCTL class object
+prj_meta = octl.prj_meta
+prj_dirs = octl.prj_dirs
 
-# US Congress years and their associated Congress Numbers
-year_congress = [(2010, 111), (2011, 112), (2012, 112), (2013, 113), (2014, 114), (2015, 114), (2016, 115), (2017, 115), (2018, 116), (2019, 116), (2020, 116), (2021, 116), (2022, 118), (2023, 118), (2024, 119)]
+# Get the codebook from the OCTL class object
+cb = octl.cb
+cbdf = octl.cbdf
 
-for (y, c) in year_congress:
-    print(f"Year: {y} | Congress: {c}th | Geodatabase: octl{y}.gdb")
-
-# Initialize OCTL class
-octl = OCTL()
+# Get the raw data
+tl_data = octl.tl_data
 
 
-### Metadata Icons ----
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# 2. Process Shapefiles to Geodatabase ----
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+print("\n2. Process Shapefiles to Geodatabase\n")
 
-# Metadata icon logo paths
-logo_icons = {
-    "D": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/e2c4cd39783a4d1bb0925ead15a23cdc/data",
-    "E": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/cc5efcd5c13d4025959c689a7f08e8cf/data",
-    "H": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/412ef3a8487141dc8efbf7e2002cf695/data",
-    "S": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/59662c66336141a4af9e888c10460905/data"
-    }
+# Process the shapefiles and get the dictionary of feature classes and codes
+tl_dict = octl.process_shapefiles()

@@ -16,7 +16,7 @@ arcpy.env.workspace = os.getcwd()
 arcpy.env.overwriteOutput = True
 
 # Initialize the OCTL class object
-octl = OCTL(part = 0, version = 2026.1)
+octl = yieldOCTL(part = 0, version = 2026.1)
 
 # Get the project metadata and directories from the OCTL class object
 prj_meta = octl.prj_meta
@@ -28,6 +28,3 @@ cbdf = octl.cbdf
 
 # Get the raw data
 tl_data = octl.tl_data
-
-# Process the shapefiles and get the dictionary of feature classes and codes
-tl_dict = octl.process_shapefiles()
