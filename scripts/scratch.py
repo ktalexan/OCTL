@@ -28,8 +28,3 @@ cb_df = octl.cb_df
 
 
 
-
-gdb_dict = octl.get_gdb_dict()
-
-year_list = [int(y) for y in gdb_dict.keys()]
-
