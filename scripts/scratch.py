@@ -26,6 +26,9 @@ prj_dirs = octl.prj_dirs
 cb = octl.cb
 cb_df = octl.cb_df
     
-# Get the raw data
-tl_data = octl.tl_data
 
+
+
+gdb_dict = octl.get_gdb_dict()
+
+year_list = [int(y) for y in gdb_dict.keys()]

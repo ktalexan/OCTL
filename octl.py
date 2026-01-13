@@ -49,9 +49,6 @@ class OCTL:
         self.cb_path = os.path.join(self.prj_dirs["codebook"], "cb.json")
         self.cb, self.cb_df = self.load_cb(silent = False)
 
-        # Get the raw data
-        self.tl_data = self.get_raw_data()
-
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ## Fx: Create Project Metadata ----
@@ -276,13 +273,13 @@ class OCTL:
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ## Fx: Create Geodatabase ----
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    def create_gdb(self):
+    def create_gdb(self, year: int) -> str:
         """
         Create a geodatabase.
         Args:
-            Nothing
+            year (int): The year of the geodatabase.
         Returns:
-            Nothing
+            gdb_path (str): The path to the geodatabase.
         Raises:
             Nothing
         Example:
@@ -290,7 +287,7 @@ class OCTL:
         Notes:
             This function creates a geodatabase.
         """
-        gdb_name = f"TL{self.tl_data["year"]}.gdb"
+        gdb_name = f"TL{year}.gdb"
         gdb_path = os.path.join(self.prj_dirs["gis"], gdb_name)
 
         if not arcpy.Exists(gdb_path):
@@ -310,685 +307,691 @@ class OCTL:
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ## Fx: Get Metadata for Feature Classes ----
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    def process_metadata(self):
+    def process_metadata(self, year: int) -> dict:
         """
         Process metadata for feature classes.
         Args:
-            Nothing
+            year (int): The year of the feature classes.
         Returns:
-            Nothing
+            fc_metadata (dict): A dictionary containing metadata for feature classes.
+        Raises:
+            ValueError: If year is not an integer.
+        Example:
+            >>> process_metadata(2025)
+        Notes:
+            This function processes metadata for feature classes.
         """
         
         # Initialize an empty dictionary to store metadata for feature classes
         fc_metadata = {
             "06059_addr": {
                 "abbrev": "ADDR",
-                "alias":  f"OCTL {self.tl_data["year"]} Address Ranges",
+                "alias":  f"OCTL {year} Address Ranges",
                 "type": "Table",
                 "fcname": "AD",
                 "group": "Feature Relationships",
                 "category": "Relationship Files",
                 "label": "Address Ranges Relationship File",
-                "title": f"OCTL {self.tl_data["year"]} Address Ranges Relationship",
+                "title": f"OCTL {year} Address Ranges Relationship",
                 "tags": "Orange County, California, OCTL, TigerLines, Address, Relationships, Table",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} Address Ranges Relationship Table",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} Address Ranges Relationship Table",
+                "summary": f"Orange County Tiger Lines {year} Address Ranges Relationship Table",
+                "description": f"Orange County Tiger Lines {year} Address Ranges Relationship Table",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"            
             },
             "06059_addrfeat": {
                 "abbrev": "ADDRFEAT",
-                "alias": f"OCTL {self.tl_data["year"]} Address Range Features",
+                "alias": f"OCTL {year} Address Range Features",
                 "type": "Feature Class",
                 "fcname": "AF",
                 "group": "Feature Relationships",
                 "category": "Relationship Files",
                 "label": "Address Range Feature Table",
-                "title": f"OCTL {self.tl_data["year"]} Address Range Features",
+                "title": f"OCTL {year} Address Range Features",
                 "tags": "Orange County, California, OCTL, TigerLines, Address, Relationships, Feature Class",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} Address Range Features",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} Address Range Features",
+                "summary": f"Orange County Tiger Lines {year} Address Range Features",
+                "description": f"Orange County Tiger Lines {year} Address Range Features",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "06059_addrfn": {
                 "abbrev": "ADDRFN",
-                "alias": f"OCTL {self.tl_data["year"]} Address Range Feature Names",
+                "alias": f"OCTL {year} Address Range Feature Names",
                 "type": "Table",
                 "fcname": "AN",
                 "group": "Feature Relationships",
                 "category": "Relationship Files",
                 "label": "Address Range-Feature Name Relationship Table",
-                "title": f"OCTL {self.tl_data["year"]} Address Range Feature Names",
+                "title": f"OCTL {year} Address Range Feature Names",
                 "tags": "Orange County, California, OCTL, TigerLines, Address Range, Feature Names, Relationship Files, Table",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} Address Range Feature Names Table",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} Address Range Feature Names Table",
+                "summary": f"Orange County Tiger Lines {year} Address Range Feature Names Table",
+                "description": f"Orange County Tiger Lines {year} Address Range Feature Names Table",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "06059_areawater": {
                 "abbrev": "AREAWATER",
-                "alias": f"OCTL {self.tl_data["year"]} Area Hydrography",
+                "alias": f"OCTL {year} Area Hydrography",
                 "type": "Feature Class",
                 "fcname": "WA",
                 "group": "Features",
                 "category": "Water",
                 "label": "Area Hydrography",
-                "title": f"OCTL {self.tl_data["year"]} Area Hydrography",
+                "title": f"OCTL {year} Area Hydrography",
                 "tags": "Orange County, California, OCTL, TigerLines, Area Hydrography, Water, Feature Class",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} Area Hydrography",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} Area Hydrography",
+                "summary": f"Orange County Tiger Lines {year} Area Hydrography",
+                "description": f"Orange County Tiger Lines {year} Area Hydrography",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "06059_edges": {
                 "abbrev": "EDGES",
-                "alias": f"OCTL {self.tl_data["year"]} All Lines",
+                "alias": f"OCTL {year} All Lines",
                 "type": "Feature Class",
                 "fcname": "ED",
                 "group": "Features",
                 "category": "All Lines",
                 "label": "All Lines",
-                "title": f"OCTL {self.tl_data["year"]} All Lines",
+                "title": f"OCTL {year} All Lines",
                 "tags": "Orange County, California, OCTL, TigerLines, All Lines, Feature Class",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} All Lines",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} All Lines",
+                "summary": f"Orange County Tiger Lines {year} All Lines",
+                "description": f"Orange County Tiger Lines {year} All Lines",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "06059_faces": {
                 "abbrev": "FACES",
-                "alias": f"OCTL {self.tl_data["year"]} Topological Faces",
+                "alias": f"OCTL {year} Topological Faces",
                 "type": "Feature Class",
                 "fcname": "FC",
                 "group": "Feature Relationships",
                 "category": "Relationship Files",
                 "label": "Topological Faces (Polygons with all Geocodes) Feature Class",
-                "title": f"OCTL {self.tl_data["year"]} Topological Faces",
+                "title": f"OCTL {year} Topological Faces",
                 "tags": "Orange County, California, OCTL, TigerLines, Topological Faces, Feature Class",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} Topological Faces",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} Topological Faces",
+                "summary": f"Orange County Tiger Lines {year} Topological Faces",
+                "description": f"Orange County Tiger Lines {year} Topological Faces",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "06059_facesah": {
                 "abbrev": "FACESAH",
-                "alias": f"OCTL {self.tl_data["year"]} Topological Faces-Area Hydrography",
+                "alias": f"OCTL {year} Topological Faces-Area Hydrography",
                 "type": "Table",
                 "fcname": "FH",
                 "group": "Feature Relationships",
                 "category": "Relationship Files",
                 "label": "Topological Faces-Area Hydrography Relationship Table",
-                "title": f"OCTL {self.tl_data["year"]} Topological Faces-Area Hydrography Relationship",
+                "title": f"OCTL {year} Topological Faces-Area Hydrography Relationship",
                 "tags": "Orange County, California, OCTL, TigerLines, Topological Faces-Area Hydrography, Relationship Table",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} Topological Faces-Area Hydrography Relationship Table",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} Topological Faces-Area Hydrography Relationship Table",
+                "summary": f"Orange County Tiger Lines {year} Topological Faces-Area Hydrography Relationship Table",
+                "description": f"Orange County Tiger Lines {year} Topological Faces-Area Hydrography Relationship Table",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "06059_featnames": {
                 "abbrev": "FEATNAMES",
-                "alias": f"OCTL {self.tl_data["year"]} Feature Names",
+                "alias": f"OCTL {year} Feature Names",
                 "type": "Table",
                 "fcname": "FN",
                 "group": "Feature Relationships",
                 "category": "Relationship Files",
                 "label": "Feature Names Relationship Table",
-                "title": f"OCTL {self.tl_data["year"]} Feature Names Relationship",
+                "title": f"OCTL {year} Feature Names Relationship",
                 "tags": "Orange County, California, OCTL, TigerLines, Feature Names, Relationship Table",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} Feature Names Relationship Table",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} Feature Names Relationship Table",
+                "summary": f"Orange County Tiger Lines {year} Feature Names Relationship Table",
+                "description": f"Orange County Tiger Lines {year} Feature Names Relationship Table",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "06059_linearwater": {
                 "abbrev": "LINEARWATER",
-                "alias": f"OCTL {self.tl_data["year"]} Linear Hydrography",
+                "alias": f"OCTL {year} Linear Hydrography",
                 "type": "Feature Class",
                 "fcname": "WL",
                 "group": "Features",
                 "category": "Water",
                 "label": "Linear Hydrography",
-                "title": f"OCTL {self.tl_data["year"]} Linear Hydrography",
+                "title": f"OCTL {year} Linear Hydrography",
                 "tags": "Orange County, California, OCTL, TigerLines, Linear Hydrography",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} Linear Hydrography",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} Linear Hydrography",
+                "summary": f"Orange County Tiger Lines {year} Linear Hydrography",
+                "description": f"Orange County Tiger Lines {year} Linear Hydrography",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "06059_roads": {
                 "abbrev": "ROADS",
-                "alias": f"OCTL {self.tl_data["year"]} All Roads",
+                "alias": f"OCTL {year} All Roads",
                 "type": "Feature Class",
                 "fcname": "RD",
                 "group": "Feature",
                 "category": "Roads",
                 "label": "All Roads",
-                "title": f"OCTL {self.tl_data["year"]} All Roads",
+                "title": f"OCTL {year} All Roads",
                 "tags": "Orange County, California, OCTL, TigerLines, Roads, Transportation",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} All Roads",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} All Roads",
+                "summary": f"Orange County Tiger Lines {year} All Roads",
+                "description": f"Orange County Tiger Lines {year} All Roads",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "06_arealm": {
                 "abbrev": "AREALM",
-                "alias": f"OCTL {self.tl_data["year"]} Area Landmarks",
+                "alias": f"OCTL {year} Area Landmarks",
                 "type": "Feature Class",
                 "fcname": "LA",
                 "group": "Features",
                 "category": "Landmarks",
                 "label": "Area Landmarks",
-                "title": f"OCTL {self.tl_data["year"]} Area Landmarks",
+                "title": f"OCTL {year} Area Landmarks",
                 "tags": "Orange County, California, OCTL, TigerLines, Landmarks",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} Area Landmarks",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} Area Landmarks",
+                "summary": f"Orange County Tiger Lines {year} Area Landmarks",
+                "description": f"Orange County Tiger Lines {year} Area Landmarks",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "06_bg": {
                 "abbrev": "BG",
-                "alias": f"OCTL {self.tl_data["year"]} Block Groups",
+                "alias": f"OCTL {year} Block Groups",
                 "type": "Feature Class",
                 "fcname": "BG",
                 "group": "Geographic Areas",
                 "category": "Block Groups",
                 "label": "Block Groups",
-                "title": f"OCTL {self.tl_data["year"]} Block Groups",
+                "title": f"OCTL {year} Block Groups",
                 "tags": "Orange County, California, OCTL, TigerLines, Block Groups",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} Block Groups",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} Block Groups",
+                "summary": f"Orange County Tiger Lines {year} Block Groups",
+                "description": f"Orange County Tiger Lines {year} Block Groups",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "06_cd118": {
                 "abbrev": "CD118",
-                "alias": f"OCTL {self.tl_data["year"]} Congressional Districts 118th",
+                "alias": f"OCTL {year} Congressional Districts 118th",
                 "type": "Feature Class",
                 "fcname": "CD",
                 "group": "Geographic Areas",
                 "category": "Congressional Districts",
                 "label": "Congressional Districts of the 118th US Congress",
-                "title": f"OCTL {self.tl_data["year"]} Congressional Districts 118th",
+                "title": f"OCTL {year} Congressional Districts 118th",
                 "tags": "Orange County, California, OCTL, TigerLines, Congressional Districts",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} Congressional Districts of the 118th US Congress",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} Congressional Districts of the 118th US Congress",
+                "summary": f"Orange County Tiger Lines {year} Congressional Districts of the 118th US Congress",
+                "description": f"Orange County Tiger Lines {year} Congressional Districts of the 118th US Congress",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "06_cd119": {
                 "abbrev": "CD119",
-                "alias": f"OCTL {self.tl_data["year"]} Congressional Districts 119th",
+                "alias": f"OCTL {year} Congressional Districts 119th",
                 "type": "Feature Class",
                 "fcname": "CD",
                 "group": "Geographic Areas",
                 "category": "Congressional Districts",
                 "label": "Congressional Districts of the 119th US Congress",
-                "title": f"OCTL {self.tl_data["year"]} Congressional Districts 119th",
+                "title": f"OCTL {year} Congressional Districts 119th",
                 "tags": "Orange County, California, OCTL, TigerLines, Congressional Districts",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} Congressional Districts of the 119th US Congress",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} Congressional Districts of the 119th US Congress",
+                "summary": f"Orange County Tiger Lines {year} Congressional Districts of the 119th US Congress",
+                "description": f"Orange County Tiger Lines {year} Congressional Districts of the 119th US Congress",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "06_cousub": {
                 "abbrev": "COUSUB",
-                "alias": f"OCTL {self.tl_data["year"]} County Subdivisions",
+                "alias": f"OCTL {year} County Subdivisions",
                 "type": "Feature Class",
                 "fcname": "CS",
                 "group": "Geographic Areas",
                 "category": "County Subdivisions",
                 "label": "County Subdivisions",
-                "title": f"OCTL {self.tl_data["year"]} County Subdivisions",
+                "title": f"OCTL {year} County Subdivisions",
                 "tags": "Orange County, California, OCTL, TigerLines, County Subdivisions",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} County Subdivisions",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} County Subdivisions",
+                "summary": f"Orange County Tiger Lines {year} County Subdivisions",
+                "description": f"Orange County Tiger Lines {year} County Subdivisions",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "06_elsd": {
                 "abbrev": "ELSD",
-                "alias": f"OCTL {self.tl_data["year"]} Elementary School Districts",
+                "alias": f"OCTL {year} Elementary School Districts",
                 "type": "Feature Class",
                 "fcname": "SE",
                 "group": "Geographic Areas",
                 "category": "School Districts",
                 "label": "Elementary School Districts",
-                "title": f"OCTL {self.tl_data["year"]} Elementary School Districts",
+                "title": f"OCTL {year} Elementary School Districts",
                 "tags": "Orange County, California, OCTL, TigerLines, Schools, School Districts, Elementary School Districts",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} Elementary School Districts",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} Elementary School Districts",
+                "summary": f"Orange County Tiger Lines {year} Elementary School Districts",
+                "description": f"Orange County Tiger Lines {year} Elementary School Districts",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "06_facesal": {
                 "abbrev": "FACESAL",
-                "alias": f"OCTL {self.tl_data["year"]} Topological Faces-Area Landmark",
+                "alias": f"OCTL {year} Topological Faces-Area Landmark",
                 "type": "Table",
                 "fcname": "FL",
                 "group": "Feature Relationships",
                 "category": "Relationship Files",
                 "label": "Topological Faces-Area Landmark Relationship Table",
-                "title": f"OCTL {self.tl_data["year"]} Topological Faces-Area Landmark Relationship Table",
+                "title": f"OCTL {year} Topological Faces-Area Landmark Relationship Table",
                 "tags": "Orange County, California, OCTL, TigerLines, Topological Faces-Area Landmark, Relationship File, Feature Relationship",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} Topological Faces-Area Landmark Relationship Table",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} Topological Faces-Area Landmark Relationship Table",
+                "summary": f"Orange County Tiger Lines {year} Topological Faces-Area Landmark Relationship Table",
+                "description": f"Orange County Tiger Lines {year} Topological Faces-Area Landmark Relationship Table",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "06_place": {
                 "abbrev": "PLACE",
-                "alias": f"OCTL {self.tl_data["year"]} Cities or Places",
+                "alias": f"OCTL {year} Cities or Places",
                 "type": "Feature Class",
                 "fcname": "PL",
                 "group": "Geographic Areas",
                 "category": "Places",
                 "label": "Place (Cities or Unincorporated Areas)",
-                "title": f"OCTL {self.tl_data["year"]} Cities or Places",
+                "title": f"OCTL {year} Cities or Places",
                 "tags": "Orange County, California, OCTL, TigerLines, Cities or Places, Place, Geographic Area, Cities, Unincorporated Areas",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} Cities or Places",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} Cities or Places",
+                "summary": f"Orange County Tiger Lines {year} Cities or Places",
+                "description": f"Orange County Tiger Lines {year} Cities or Places",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "06_pointlm": {
                 "abbrev": "POINTLM",
-                "alias": f"OCTL {self.tl_data["year"]} Point Landmarks",
+                "alias": f"OCTL {year} Point Landmarks",
                 "type": "Feature Class",
                 "fcname": "LP",
                 "group": "Features",
                 "category": "Landmarks",
                 "label": "Point Landmarks",
-                "title": f"OCTL {self.tl_data["year"]} Point Landmarks",
+                "title": f"OCTL {year} Point Landmarks",
                 "tags": "Orange County, California, OCTL, TigerLines, Point Landmarks, Point, Landmarks, Features",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} Point Landmarks",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} Point Landmarks",
+                "summary": f"Orange County Tiger Lines {year} Point Landmarks",
+                "description": f"Orange County Tiger Lines {year} Point Landmarks",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "06_prisecroads": {
                 "abbrev": "PRISECROADS",
-                "alias": f"OCTL {self.tl_data["year"]} Primary and Secondary Roads",
+                "alias": f"OCTL {year} Primary and Secondary Roads",
                 "type": "Feature Class",
                 "fcname": "RS",
                 "group": "Features",
                 "category": "Roads",
                 "label": "Primary and Secondary Roads",
-                "title": f"OCTL {self.tl_data["year"]} Primary and Secondary Roads",
+                "title": f"OCTL {year} Primary and Secondary Roads",
                 "tags": "Orange County, California, OCTL, TigerLines, Primary and Secondary Roads, Roads, Features, Transportation",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} Primary and Secondary Roads",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} Primary and Secondary Roads",
+                "summary": f"Orange County Tiger Lines {year} Primary and Secondary Roads",
+                "description": f"Orange County Tiger Lines {year} Primary and Secondary Roads",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "06_puma20": {
                 "abbrev": "PUMA",
-                "alias": f"OCTL {self.tl_data["year"]} Public Use Microdata Areas",
+                "alias": f"OCTL {year} Public Use Microdata Areas",
                 "type": "Feature Class",
                 "fcname": "PU",
                 "group": "Geographic Areas",
                 "category": "Public Use Microdata Areas",
                 "label": "Public Use Microdata Areas",
-                "title": f"OCTL {self.tl_data["year"]} Public Use Microdata Areas",
+                "title": f"OCTL {year} Public Use Microdata Areas",
                 "tags": "Orange County, California, OCTL, TigerLines, Public Use Microdata Areas, PUMA, Geographic Areas, Features",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} Public Use Microdata Areas",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} Public Use Microdata Areas",
+                "summary": f"Orange County Tiger Lines {year} Public Use Microdata Areas",
+                "description": f"Orange County Tiger Lines {year} Public Use Microdata Areas",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "06_scsd": {
                 "abbrev": "SCSD",
-                "alias": f"OCTL {self.tl_data["year"]} Secondary School Districts",
+                "alias": f"OCTL {year} Secondary School Districts",
                 "type": "Feature Class",
                 "fcname": "SS",
                 "group": "Geographic Areas",
                 "category": "School Districts",
                 "label": "Secondary School Districts",
-                "title": f"OCTL {self.tl_data["year"]} Secondary School Districts",
+                "title": f"OCTL {year} Secondary School Districts",
                 "tags": "Orange County, California, OCTL, TigerLines, Secondary School Districts, SCSD, Geographic Areas, Schools, Secondary Schools",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} Secondary School Districts",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} Secondary School Districts",
+                "summary": f"Orange County Tiger Lines {year} Secondary School Districts",
+                "description": f"Orange County Tiger Lines {year} Secondary School Districts",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "06_sldl": {
                 "abbrev": "SLDL",
-                "alias": f"OCTL {self.tl_data["year"]} State Assembly Legislative Districts",
+                "alias": f"OCTL {year} State Assembly Legislative Districts",
                 "type": "Feature Class",
                 "fcname": "LL",
                 "group": "Geographic Areas",
                 "category": "State Legislative Districts",
                 "label": "State Legislative District - Lower Chamber (Assembly)",
-                "title": f"OCTL {self.tl_data["year"]} State Assembly Legislative Districts",
+                "title": f"OCTL {year} State Assembly Legislative Districts",
                 "tags": "Orange County, California, OCTL, TigerLines, Legislative Districts, State Assembly",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} State Assembly Legislative Districts",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} State Assembly Legislative Districts",
+                "summary": f"Orange County Tiger Lines {year} State Assembly Legislative Districts",
+                "description": f"Orange County Tiger Lines {year} State Assembly Legislative Districts",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "06_sldu": {
                 "abbrev": "SLDU",
-                "alias": f"OCTL {self.tl_data["year"]} State Senate Legislative Districts",
+                "alias": f"OCTL {year} State Senate Legislative Districts",
                 "type": "Feature Class",
                 "fcname": "LU",
                 "group": "Geographic Areas",
                 "category": "State Legislative Districts",
                 "label": "State Legislative District - Upper Chamber (Senate)",
-                "title": f"OCTL {self.tl_data["year"]} State Senate Legislative Districts",
+                "title": f"OCTL {year} State Senate Legislative Districts",
                 "tags": "Orange County, California, OCTL, TigerLines, Legislative Districts, State Senate",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} State Senate Legislative Districts",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} State Senate Legislative Districts",
+                "summary": f"Orange County Tiger Lines {year} State Senate Legislative Districts",
+                "description": f"Orange County Tiger Lines {year} State Senate Legislative Districts",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "06_tabblock20": {
                 "abbrev": "TABBLOCK",
-                "alias": f"OCTL {self.tl_data["year"]} Blocks",
+                "alias": f"OCTL {year} Blocks",
                 "type": "Feature Class",
                 "fcname": "BL",
                 "group": "Geographic Areas",
                 "category": "Blocks",
                 "label": "Block",
-                "title": f"OCTL {self.tl_data["year"]} Blocks",
+                "title": f"OCTL {year} Blocks",
                 "tags": "Orange County, California, OCTL, TigerLines, Blocks",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} Blocks",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} Blocks",
+                "summary": f"Orange County Tiger Lines {year} Blocks",
+                "description": f"Orange County Tiger Lines {year} Blocks",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "06_tract": {
                 "abbrev": "TRACT",
-                "alias": f"OCTL {self.tl_data["year"]} Census Tracts",
+                "alias": f"OCTL {year} Census Tracts",
                 "type": "Feature Class",
                 "fcname": "TR",
                 "group": "Geographic Areas",
                 "category": "Census Tracts",
                 "label": "Census Tract",
-                "title": f"OCTL {self.tl_data["year"]} Census Tracts",
+                "title": f"OCTL {year} Census Tracts",
                 "tags": "Orange County, California, OCTL, TigerLines, Census Tracts",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} Census Tracts",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} Census Tracts",
+                "summary": f"Orange County Tiger Lines {year} Census Tracts",
+                "description": f"Orange County Tiger Lines {year} Census Tracts",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "06_unsd": {
                 "abbrev": "UNSD",
-                "alias": f"OCTL {self.tl_data["year"]} Unified School Districts",
+                "alias": f"OCTL {year} Unified School Districts",
                 "type": "Feature Class",
                 "fcname": "SU",
                 "group": "Geographic Areas",
                 "category": "School Districts",
                 "label": "Unified School District",
-                "title": f"OCTL {self.tl_data["year"]} Unified School Districts",
+                "title": f"OCTL {year} Unified School Districts",
                 "tags": "Orange County, California, OCTL, TigerLines, Unified School Districts, Schools, School Districts",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} Unified School Districts",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} Unified School Districts",
+                "summary": f"Orange County Tiger Lines {year} Unified School Districts",
+                "description": f"Orange County Tiger Lines {year} Unified School Districts",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "us_aitsn": {
                 "abbrev": "AITSN",
-                "alias": f"OCTL {self.tl_data["year"]} Tribal Subdivisions",
+                "alias": f"OCTL {year} Tribal Subdivisions",
                 "type": "Feature Class",
                 "fcname": "TS",
                 "group": "Geographic Areas",
                 "category": "American Indian Area Geography",
                 "label": "American Indian Tribal Subdivision",
-                "title": f"OCTL {self.tl_data["year"]} Tribal Subdivisions Feature Class",
+                "title": f"OCTL {year} Tribal Subdivisions Feature Class",
                 "tags": "Orange County, California, OCTL, TigerLines, Tribal Subdivisions, American Indian Area Geography",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} Tribal Subdivisions Feature Class",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} Tribal Subdivisions Feature Class",
+                "summary": f"Orange County Tiger Lines {year} Tribal Subdivisions Feature Class",
+                "description": f"Orange County Tiger Lines {year} Tribal Subdivisions Feature Class",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data",
             },
             "us_cbsa": {
                 "abbrev": "CBSA",
-                "alias": f"OCTL {self.tl_data["year"]} Metropolitan Statistical Areas",
+                "alias": f"OCTL {year} Metropolitan Statistical Areas",
                 "type": "Feature Class",
                 "fcname": "SM",
                 "group": "Geographic Areas",
                 "category": "Core Based Statistical Areas",
                 "label": "Metropolitan/Micropolitan Statistical Area",
-                "title": f"OCTL {self.tl_data["year"]} Metropolitan Statistical Areas",
+                "title": f"OCTL {year} Metropolitan Statistical Areas",
                 "tags": "Orange County, California, OCTL, TigerLines, Metropolitan Statistical Areas, Core Based Statistical Areas",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} Metropolitan Statistical Areas",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} Metropolitan Statistical Areas",
+                "summary": f"Orange County Tiger Lines {year} Metropolitan Statistical Areas",
+                "description": f"Orange County Tiger Lines {year} Metropolitan Statistical Areas",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"
             },
             "us_cd116": {
                 "abbrev": "CD116",
-                "alias": f"OCTL {self.tl_data["year"]} Congressional Districts 116th",
+                "alias": f"OCTL {year} Congressional Districts 116th",
                 "type": "Feature Class",
                 "fcname": "CD",
                 "group": "Geographic Areas",
                 "category": "Congressional Districts",
                 "label": "Congressional Districts of the 116th US Congress",
-                "title": f"OCTL {self.tl_data["year"]} Congressional Districts of the 116th US Congress",
+                "title": f"OCTL {year} Congressional Districts of the 116th US Congress",
                 "tags": "Orange County, California, OCTL, TigerLines, Congressional Districts, 116th US Congress",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} Congressional Districts of the 116th US Congress",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} Congressional Districts of the 116th US Congress",
+                "summary": f"Orange County Tiger Lines {year} Congressional Districts of the 116th US Congress",
+                "description": f"Orange County Tiger Lines {year} Congressional Districts of the 116th US Congress",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "us_coastline": {
                 "abbrev": "COASTLINE",
-                "alias": f"OCTL {self.tl_data["year"]} Coastlines",
+                "alias": f"OCTL {year} Coastlines",
                 "type": "Feature Class",
                 "fcname": "CL",
                 "group": "Geographic Areas",
                 "category": "Coastlines",
                 "label": "Coastline",
-                "title": f"OCTL {self.tl_data["year"]} Coastlines",
+                "title": f"OCTL {year} Coastlines",
                 "tags": "Orange County, California, Coastlines, OCTL, TigerLines",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} Coastlines",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} Coastlines",
+                "summary": f"Orange County Tiger Lines {year} Coastlines",
+                "description": f"Orange County Tiger Lines {year} Coastlines",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "us_county": {
                 "abbrev": "COUNTY",
-                "alias": f"OCTL {self.tl_data["year"]} Orange County",
+                "alias": f"OCTL {year} Orange County",
                 "type": "Feature Class",
                 "fcname": "CO",
                 "group": "Geographic Areas",
                 "category": "Counties",
                 "label": "County and Equivalent",
-                "title": f"OCTL {self.tl_data["year"]} Orange County",
+                "title": f"OCTL {year} Orange County",
                 "tags": "Orange County, California, Counties, OCTL, TigerLines",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} Orange County",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} Orange County",
+                "summary": f"Orange County Tiger Lines {year} Orange County",
+                "description": f"Orange County Tiger Lines {year} Orange County",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "us_csa": {
                 "abbrev": "CSA",
-                "alias": f"OCTL {self.tl_data["year"]} Combined Statistical Areas",
+                "alias": f"OCTL {year} Combined Statistical Areas",
                 "type": "Feature Class",
                 "fcname": "SC",
                 "group": "Geographic Areas",
                 "category": "Core Based Statistical Areas",
                 "label": "Combined Statistical Area",
-                "title": f"OCTL {self.tl_data["year"]} Combined Statistical Areas",
+                "title": f"OCTL {year} Combined Statistical Areas",
                 "tags": "Orange County, California, Core Based Statistical Areas, OCTL, TigerLines",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} Combined Statistical Areas",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} Combined Statistical Areas",
+                "summary": f"Orange County Tiger Lines {year} Combined Statistical Areas",
+                "description": f"Orange County Tiger Lines {year} Combined Statistical Areas",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "us_facesmil": {
                 "abbrev": "FACEMIL",
-                "alias": f"OCTL {self.tl_data["year"]} Topological Faces-Military Installations",
+                "alias": f"OCTL {year} Topological Faces-Military Installations",
                 "type": "Table",
                 "fcname": "FM",
                 "group": "Feature Relationships",
                 "category": "Relationship Files",
                 "label": "Topological Faces-Military Installations Relationship Table",
-                "title": f"OCTL {self.tl_data["year"]} Topological Faces-Military Installations Relationship Table",
+                "title": f"OCTL {year} Topological Faces-Military Installations Relationship Table",
                 "tags": "Orange County, California, Military Installations, OCTL, TigerLines, Relationship Files, Topological Faces",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} Topological Faces-Military Installations Relationship Table",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} Topological Faces-Military Installations Relationship Table",
+                "summary": f"Orange County Tiger Lines {year} Topological Faces-Military Installations Relationship Table",
+                "description": f"Orange County Tiger Lines {year} Topological Faces-Military Installations Relationship Table",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "us_metdiv": {
                 "abbrev": "METDIV",
-                "alias": f"OCTL {self.tl_data["year"]} Metropolitan Divisions",
+                "alias": f"OCTL {year} Metropolitan Divisions",
                 "type": "Feature Class",
                 "fcname": "MD",
                 "group": "Geographic Areas",
                 "category": "Core Based Statistical Areas",
                 "label": "Metropolitan Division",
-                "title": f"OCTL {self.tl_data["year"]} Metropolitan Divisions",
+                "title": f"OCTL {year} Metropolitan Divisions",
                 "tags": "Orange County, California, Metropolitan Divisions, OCTL, TigerLines",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} Metropolitan Divisions",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} Metropolitan Divisions",
+                "summary": f"Orange County Tiger Lines {year} Metropolitan Divisions",
+                "description": f"Orange County Tiger Lines {year} Metropolitan Divisions",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "us_mil": {
                 "abbrev": "MIL",
-                "alias": f"OCTL {self.tl_data["year"]} Military Installations",
+                "alias": f"OCTL {year} Military Installations",
                 "type": "Feature Class",
                 "fcname": "ML",
                 "group": "Features",
                 "category": "Military Installations",
                 "label": "Military Installations",
-                "title": f"OCTL {self.tl_data["year"]} Military Installations",
+                "title": f"OCTL {year} Military Installations",
                 "tags": "Orange County, California, Military Installations, OCTL, TigerLines",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} Military Installations",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} Military Installations",
+                "summary": f"Orange County Tiger Lines {year} Military Installations",
+                "description": f"Orange County Tiger Lines {year} Military Installations",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "us_primaryroads": {
                 "abbrev": "PRIMARYROADS",
-                "alias": f"OCTL {self.tl_data["year"]} Primary Roads",
+                "alias": f"OCTL {year} Primary Roads",
                 "type": "Feature Class",
                 "fcname": "RP",
                 "group": "Features",
                 "category": "Roads",
                 "label": "Primary Roads",
-                "title": f"OCTL {self.tl_data["year"]} Primary Roads",
+                "title": f"OCTL {year} Primary Roads",
                 "tags": "Orange County, California, Primary Roads, OCTL, TigerLines, Roads, Transportation",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} Primary Roads",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} Primary Roads",
+                "summary": f"Orange County Tiger Lines {year} Primary Roads",
+                "description": f"Orange County Tiger Lines {year} Primary Roads",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "us_rails": {
                 "abbrev": "RAILS",
-                "alias": f"OCTL {self.tl_data["year"]} Rails",
+                "alias": f"OCTL {year} Rails",
                 "type": "Feature Class",
                 "fcname": "RL",
                 "group": "Features",
                 "category": "Rails",
                 "label": "Rails",
-                "title": f"OCTL {self.tl_data["year"]} Rails",
+                "title": f"OCTL {year} Rails",
                 "tags": "Orange County, California, Rails, OCTL, TigerLines, Transportation",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} Rails",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} Rails",
+                "summary": f"Orange County Tiger Lines {year} Rails",
+                "description": f"Orange County Tiger Lines {year} Rails",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "us_tbg": {
                 "abbrev": "TBG",
-                "alias": f"OCTL {self.tl_data["year"]} Tribal Block Groups",
+                "alias": f"OCTL {year} Tribal Block Groups",
                 "type": "Feature Class",
                 "fcname": "TB",
                 "group": "Geographic Areas",
                 "category": "American Indian Area Geography",
                 "label": "Tribal Block Groups",
-                "title": f"OCTL {self.tl_data["year"]} Tribal Block Groups",
+                "title": f"OCTL {year} Tribal Block Groups",
                 "tags": "Orange County, California, Tribal Block Groups, OCTL, TigerLines, Geography, Block Groups",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} Tribal Block Groups",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} Tribal Block Groups",
+                "summary": f"Orange County Tiger Lines {year} Tribal Block Groups",
+                "description": f"Orange County Tiger Lines {year} Tribal Block Groups",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "us_ttract": {
                 "abbrev": "TTRACT",
-                "alias": f"OCTL {self.tl_data["year"]} Tribal Census Tracts",
+                "alias": f"OCTL {year} Tribal Census Tracts",
                 "type": "Feature Class",
                 "fcname": "TC",
                 "group": "Geographic Areas",
                 "category": "American Indian Area Geography",
                 "label": "Tribal Census Tract",
-                "title": f"OCTL {self.tl_data["year"]} Tribal Census Tracts",
+                "title": f"OCTL {year} Tribal Census Tracts",
                 "tags": "Orange County, California, Tribal Census Tracts, OCTL, TigerLines, Geography, Census Tracts",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} Tribal Census Tracts",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} Tribal Census Tracts",
+                "summary": f"Orange County Tiger Lines {year} Tribal Census Tracts",
+                "description": f"Orange County Tiger Lines {year} Tribal Census Tracts",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "us_uac20": {
                 "abbrev": "UAC",
-                "alias": f"OCTL {self.tl_data["year"]} Urban Areas",
+                "alias": f"OCTL {year} Urban Areas",
                 "type": "Feature Class",
                 "fcname": "UA",
                 "group": "Geographic Areas",
                 "category": "Urban Areas",
                 "label": "Urban Areas",
-                "title": f"OCTL {self.tl_data["year"]} Urban Areas",
+                "title": f"OCTL {year} Urban Areas",
                 "tags": "Orange County, California, Urban Areas, OCTL, TigerLines",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} Urban Areas",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} Urban Areas",
+                "summary": f"Orange County Tiger Lines {year} Urban Areas",
+                "description": f"Orange County Tiger Lines {year} Urban Areas",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "us_zcta520": {
                 "abbrev": "ZCTA",
-                "alias": f"OCTL {self.tl_data["year"]} ZIP Code Tabulation Areas",
+                "alias": f"OCTL {year} ZIP Code Tabulation Areas",
                 "type": "Feature Class",
                 "fcname": "ZC",
                 "group": "Geographic Areas",
                 "category": "ZIP Code Tabulation Areas",
                 "label": "ZIP Code Tabulation Areas",
-                "title": f"OCTL {self.tl_data["year"]} ZIP Code Tabulation Areas",
+                "title": f"OCTL {year} ZIP Code Tabulation Areas",
                 "tags": "Orange County, California, ZIP Code Tabulation Areas, OCTL, TigerLines, ZIP codes",
-                "summary": f"Orange County Tiger Lines {self.tl_data["year"]} ZIP Code Tabulation Areas",
-                "description": f"Orange County Tiger Lines {self.tl_data["year"]} ZIP Code Tabulation Areas",
+                "summary": f"Orange County Tiger Lines {year} ZIP Code Tabulation Areas",
+                "description": f"Orange County Tiger Lines {year} ZIP Code Tabulation Areas",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"
@@ -1017,7 +1020,7 @@ class OCTL:
             This function processes shapefiles from the raw data directory and creates a geodatabase.
         """
         # Get the raw data from the OCTL class object
-        tl_data = self.tl_data
+        tl_data = self.get_raw_data()
 
         # Create a scratch geodatabase
         scratch_gdb = self.scratch_gdb(method = "create")
@@ -1055,7 +1058,7 @@ class OCTL:
             arcpy.env.workspace = os.getcwd()
 
         # Create a geodatabase for the year
-        tl_gdb = self.create_gdb()
+        tl_gdb = self.create_gdb(tl_data["year"])
 
         # Define the input and output feature classes for the county feature class
         in_oc = os.path.join(scratch_gdb, f"tl_{tl_data["year"]}_us_county")
@@ -1080,12 +1083,12 @@ class OCTL:
         final_list["CO"] = "us_county"
 
         # Create a metadata dictionary for the feature classes
-        md_dict = self.process_metadata()
+        md_dict = self.process_metadata(tl_data["year"])
 
         # Loop through the feature classes in the fc_list
         for f in fc_list:
             # Define the feature class name and code from the codebook
-            fc = f"tl_{self.tl_data["year"]}_{f}"
+            fc = f"tl_{tl_data["year"]}_{f}"
             code = self.cb[f]["code2"]
             # Define the input and output feature classes
             in_fc = os.path.join(scratch_gdb, fc)
@@ -1239,6 +1242,53 @@ class OCTL:
 
         # Return the list of feature classes in the TL geodatabase
         return final_list
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ## Fx: Get GDB Dictionary Function ----
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    def get_gdb_dict(self) -> dict:
+        """
+        Function to get the gdb dictionary from the project directories.
+        Args:
+            Nothing
+        Returns:
+            gdb_dict (dict): The gdb dictionary.
+        Raises:
+            Nothing
+        Example:
+            >>> gdb_dict = get_gdb_dict()
+        Notes:
+            This function gets the gdb dictionary from the project directories.
+        """
+        # Get the list of gdb files in the gis directory
+        gdb_list = [f for f in os.listdir(self.prj_dirs["gis"]) if f.endswith(".gdb")]
+        
+        # Initialize the gdb dictionary
+        gdb_dict = {}
+        
+        # Loop through the gdb files
+        for gdb in gdb_list:
+            year = int(gdb.split(".")[0].replace("TL", ""))
+            path = os.path.join(self.prj_dirs["gis"], gdb)
+            arcpy.env.workspace = path
+            fc_list =arcpy.ListFeatureClasses()
+            fc_dict = self.process_metadata(year)
+            
+            # Initialize the gdb dictionary for the year
+            gdb_dict[str(year)] = {}
+            
+            # Loop through the feature classes
+            for fc in fc_list:
+                # get the fc_dict key that matches the fc name and update the value
+                for key, value in fc_dict.items():
+                    if value["fcname"] == fc:
+                        gdb_dict[str(year)][fc] = value
+            
+            # Reset the workspace
+            arcpy.env.workspace = os.getcwd()
+        
+        # Return the gdb dictionary
+        return gdb_dict
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
