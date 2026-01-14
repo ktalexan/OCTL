@@ -323,6 +323,8 @@ class OCTL:
         Notes:
             This function processes metadata for feature classes.
         """
+        # US Congress dictionary mapping years to Congress Numbers
+        congress_dict = {"2010": "111", "2011": "112", "2012": "112", "2013": "113", "2014": "114", "2015": "114", "2016": "115", "2017": "115", "2018": "116", "2019": "116", "2020": "116", "2021": "116", "2022": "118", "2023": "118", "2024": "119", "2025": "119"}
         
         # Initialize an empty dictionary to store metadata for feature classes
         fc_metadata = {
@@ -532,34 +534,34 @@ class OCTL:
             },
             "06_cd118": {
                 "abbrev": "CD118",
-                "alias": f"OCTL {year} Congressional Districts 118th",
+                "alias": f"OCTL {year} Congressional Districts {congress_dict[str(year)]}th",
                 "type": "Feature Class",
                 "fcname": "CD",
                 "group": "Geographic Areas",
                 "category": "Congressional Districts",
                 "gdb": f"TL{year}.gdb",
-                "label": "Congressional Districts of the 118th US Congress",
-                "title": f"OCTL {year} Congressional Districts 118th",
-                "tags": "Orange County, California, OCTL, TigerLines, Congressional Districts",
-                "summary": f"Orange County Tiger Lines {year} Congressional Districts of the 118th US Congress",
-                "description": f"Orange County Tiger Lines {year} Congressional Districts of the 118th US Congress",
+                "label": f"Congressional Districts of the {congress_dict[str(year)]}th US Congress",
+                "title": f"OCTL {year} Congressional Districts {congress_dict[str(year)]}th",
+                "tags": "Orange County, California, OCTL, TigerLines, Congressional Districts, US Congress",
+                "summary": f"Orange County Tiger Lines {year} Congressional Districts of the {congress_dict[str(year)]}th US Congress",
+                "description": f"Orange County Tiger Lines {year} Congressional Districts of the {congress_dict[str(year)]}th US Congress",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
             },
             "06_cd119": {
                 "abbrev": "CD119",
-                "alias": f"OCTL {year} Congressional Districts 119th",
+                "alias": f"OCTL {year} Congressional Districts {congress_dict[str(year)]}th",
                 "type": "Feature Class",
                 "fcname": "CD",
                 "group": "Geographic Areas",
                 "category": "Congressional Districts",
                 "gdb": f"TL{year}.gdb",
-                "label": "Congressional Districts of the 119th US Congress",
-                "title": f"OCTL {year} Congressional Districts 119th",
-                "tags": "Orange County, California, OCTL, TigerLines, Congressional Districts",
-                "summary": f"Orange County Tiger Lines {year} Congressional Districts of the 119th US Congress",
-                "description": f"Orange County Tiger Lines {year} Congressional Districts of the 119th US Congress",
+                "label": f"Congressional Districts of the {congress_dict[str(year)]}th US Congress",
+                "title": f"OCTL {year} Congressional Districts {congress_dict[str(year)]}th",
+                "tags": "Orange County, California, OCTL, TigerLines, Congressional Districts, US Congress",
+                "summary": f"Orange County Tiger Lines {year} Congressional Districts of the {congress_dict[str(year)]}th US Congress",
+                "description": f"Orange County Tiger Lines {year} Congressional Districts of the {congress_dict[str(year)]}th US Congress",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
@@ -821,17 +823,17 @@ class OCTL:
             },
             "us_cd116": {
                 "abbrev": "CD116",
-                "alias": f"OCTL {year} Congressional Districts 116th",
+                "alias": f"OCTL {year} Congressional Districts {congress_dict[str(year)]}th",
                 "type": "Feature Class",
                 "fcname": "CD",
                 "group": "Geographic Areas",
                 "category": "Congressional Districts",
                 "gdb": f"TL{year}.gdb",
-                "label": "Congressional Districts of the 116th US Congress",
-                "title": f"OCTL {year} Congressional Districts of the 116th US Congress",
-                "tags": "Orange County, California, OCTL, TigerLines, Congressional Districts, 116th US Congress",
-                "summary": f"Orange County Tiger Lines {year} Congressional Districts of the 116th US Congress",
-                "description": f"Orange County Tiger Lines {year} Congressional Districts of the 116th US Congress",
+                "label": f"Congressional Districts of the {congress_dict[str(year)]}th US Congress",
+                "title": f"OCTL {year} Congressional Districts of the {congress_dict[str(year)]}th US Congress",
+                "tags": "Orange County, California, OCTL, TigerLines, Congressional Districts, US Congress",
+                "summary": f"Orange County Tiger Lines {year} Congressional Districts of the {congress_dict[str(year)]}th US Congress",
+                "description": f"Orange County Tiger Lines {year} Congressional Districts of the {congress_dict[str(year)]}th US Congress",
                 "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
                 "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
                 "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"             
@@ -1114,10 +1116,13 @@ class OCTL:
             out_feature_class = out_oc,
             where_clause = "STATEFP = '06' And COUNTYFP = '059'"
         )
+
+
         # Check if the output feature class is empty
         if int(arcpy.GetCount_management(out_oc).getOutput(0)) == 0:
             arcpy.management.Delete(out_oc)
 
+        
         # Create a list to store the final feature classes
         final_list = dict()
 
@@ -1125,6 +1130,9 @@ class OCTL:
         fc_list = [f.replace(f"tl_{tl_data["year"]}_", "") for f in scratch_fcs]
         fc_list.remove("us_county")
         final_list["CO"] = "us_county"
+        
+        # Alter the alias name of the county feature class
+        arcpy.AlterAliasName(out_oc, self.cb["us_county"]["alias"])
 
         # Create a metadata dictionary for the feature classes
         md_dict = self.process_metadata(tl_data["year"])
@@ -1272,10 +1280,10 @@ class OCTL:
         # Create a metadata object for the TL geodatabase
         print(f"\nApplying metadata to the TL geodatabase:{tl_gdb}")
         md_gdb = md.Metadata(tl_gdb)
-        md_gdb.title = f"TL{self.tl_data["year"]} TigerLine Geodatabase"
+        md_gdb.title = f"TL{tl_data["year"]} TigerLine Geodatabase"
         md_gdb.tags = "Orange County, California, OCTL, TigerLine, Geodatabase"
-        md_gdb.summary = f"Orange County TigerLine Geodatabase for the {self.tl_data["year"]} year data"
-        md_gdb.description = f"Orange County TigerLine Geodatabase for the {self.tl_data["year"]} year data. The data contains feature classes for all TigerLine data available for Orange County, California."
+        md_gdb.summary = f"Orange County TigerLine Geodatabase for the {tl_data["year"]} year data"
+        md_gdb.description = f"Orange County TigerLine Geodatabase for the {tl_data["year"]} year data. The data contains feature classes for all TigerLine data available for Orange County, California."
         md_gdb.credits = "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services"
         md_gdb.accessConstraints = """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>"""
         md_gdb.thumbnailUri = "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"
@@ -1288,7 +1296,7 @@ class OCTL:
         return final_list
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    ## Fx: Get GDB Dictionary Function ----
+    ## Fx: Get GDB Dictionary ----
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     def get_gdb_dict(self) -> dict:
         """
@@ -1304,6 +1312,9 @@ class OCTL:
         Notes:
             This function gets the gdb dictionary from the project directories.
         """
+        # US Congress dictionary mapping years to Congress Numbers
+        congress_dict = {"2010": "111", "2011": "112", "2012": "112", "2013": "113", "2014": "114", "2015": "114", "2016": "115", "2017": "115", "2018": "116", "2019": "116", "2020": "116", "2021": "116", "2022": "118", "2023": "118", "2024": "119", "2025": "119"}
+
         # Get the list of gdb files in the gis directory
         gdb_list = [f for f in os.listdir(self.prj_dirs["gis"]) if f.endswith(".gdb")]
         
@@ -1323,16 +1334,97 @@ class OCTL:
             
             # Loop through the feature classes
             for fc in fc_list:
-                # get the fc_dict key that matches the fc name and update the value
-                for key, value in fc_dict.items():
-                    if value["fcname"] == fc:
+                if fc == ["CD"]:
+                    # get the congress number from the congress_dict
+                    congress_number = congress_dict[str(year)]
+                    for value in fc_dict.values():
+                        value["alias"] = f"OCTL {year} Congressional Districts {congress_number}th Congress"
+                        value["label"] = f"Congressional Districts of the {congress_number}th US Congress"
+                        value["title"] = f"OCTL {year} Congressional Districts of the {congress_number}th US Congress"
+                        value["description"] = f"Orange County Tiger Lines {year} Congressional Districts of the {congress_number}th US Congress"
                         gdb_dict[str(year)][fc] = value
+                    continue
+                else:
+                    # get the fc_dict key that matches the fc name and update the value
+                    for value in fc_dict.values():
+                        if value["fcname"] == fc:
+                            gdb_dict[str(year)][fc] = value
             
             # Reset the workspace
             arcpy.env.workspace = os.getcwd()
         
         # Return the gdb dictionary
         return gdb_dict
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ## Fx: Map Metadata ----
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    def map_metadata(self, year: int) -> dict:
+        """Function to get the map metadata for a given year.
+        Args:
+            year (int): The year for which to get the map metadata.
+        Returns:
+            dict: A dictionary containing the map metadata for the given year.
+        Raises:
+            Nothing
+        Example:
+            >>> map_metadata(2020)
+        Notes:
+            This function gets the map metadata for a given year.
+        """
+        # Convert year to string
+        year = str(year)
+
+        # Create the map metadata dictionary
+        md_map = {
+            "title": f"OCTL {year} Map",
+            "tags": f"Orange County, California, Tiger/Line, OCTL, TL{year}",
+            "summary": f"Orange County Tiger Lines Map for {year}",
+            "description": f"Orange County Tiger Lines {year} Map containing the most up-to-date spatial data for Orange County, California. This map is part of the Orange County Tiger Lines (OCTL) project, which provides comprehensive geospatial data for the county. The data includes roads, boundaries, hydrography, and other essential features derived from the U.S. Census Bureau's Tiger/Line shapefiles for {year}.",
+            "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
+            "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
+            "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"
+        }
+
+        # Return the map metadata dictionary
+        return md_map
+
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ## Fx: Write Dictionary to JSON ----
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    def write_dict_to_json(self, data: dict, dict_type: str) -> str:
+        """
+        Write a dictionary to a JSON file.
+        Args:
+            data (dict): The dictionary to write to a JSON file.
+            dict_type (str): The type of dictionary to determine the filename.
+        Returns:
+            str: The filename of the written JSON file.
+        Raises:
+            Nothing
+        Example:
+            >>> write_dict_to_json(data, "gdbs")
+        Notes:
+            This function writes a dictionary to a JSON file.
+        """
+        # Determine the filename based on the dict_type
+        match dict_type:
+            case "gdbs":
+                dict_name = "gdb_dict.json"
+            case "layers":
+                dict_name = "layers_dict.json"
+        
+        # Create the full file path
+        filename = os.path.join(self.prj_dirs["metadata"], dict_name)
+
+        # Write the dictionary to a JSON file
+        with open(filename, "w", encoding = "utf-8") as json_file:
+            json.dump(data, json_file, indent=4)
+        print(f"Dictionary written to {filename}")
+
+        # Return the filename
+        return filename
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

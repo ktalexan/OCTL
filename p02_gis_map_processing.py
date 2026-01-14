@@ -60,7 +60,6 @@ cbdf = octl.cb_df
 print("\n2. ArcGIS Pro Project Map Processing\n")
 
 
-
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ## 2.1. Create Maps in ArcGIS Pro Project ----
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -69,8 +68,21 @@ print("\n2.1. Create Maps in ArcGIS Pro Project\n")
 # Get the geodatabase dictionary from the OCTL class object
 gdb_dict = octl.get_gdb_dict()
 
+# Alter the alias names of the feature classes in the geodatabases
+for y, g in gdb_dict.items():
+    print(f"\nAltering alias names in geodatabase for year {y}:")
+    g_path = os.path.join(prj_dirs["gis"], f"TL{y}.gdb")
+    for m, f in g.items():
+        m_path = os.path.join(g_path, m)
+        f_alias = f["alias"]
+        arcpy.AlterAliasName(m_path, f_alias)
+        print(f"- Altered alias name of {m} to {f_alias}")
+
+# Write the geodatabase dictionary to a JSON file
+gdb_dict_path = octl.write_dict_to_json(gdb_dict, "gdbs")
+
 # Get the list of years from the geodatabase dictionary keys
-year_list = [int(y) for y in gdb_dict.keys()]
+year_list = [int(y) for y in gdb_dict]
 
 # Load the ArcGIS Pro project
 aprx_path = prj_dirs['gis_aprx']
@@ -134,7 +146,76 @@ for m in map_dict.values():
     for l in m.listLayers():
         if l.isBasemapLayer and l.name == "Light Gray Reference":
             l.visible = False
+
+
+### Set Map Metadata ----
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+print("\n- Set Map Metadata")
+
+# Set the map metadata for each of the maps in the project
+for m in map_dict.values():
+    # Get the year from the map name
+    year = int(m.name.replace("TL", ""))
     
+    # Get the map metadata for the year using the OCTL class method
+    map_meta = octl.map_metadata(year)
+    
+    # Set the map metadata
+    print(f"- Setting metadata for {m.name}...")
+    md_obj = md.Metadata()
+    md_obj.title = map_meta["title"]
+    md_obj.tags = map_meta["tags"]
+    md_obj.summary = map_meta["summary"]
+    md_obj.description = map_meta["description"]
+    md_obj.credits = map_meta["credits"]
+    md_obj.accessConstraints = map_meta["access"]
+    md_obj.thumbnailUri = map_meta["uri"]
+    m.metadata = md_obj
+
+
+### Save the ArcGIS Pro Project ----
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+print("\n- Save the ArcGIS Pro Project")
+
+# Save the changes to the ArcGIS Pro project
+aprx.save()
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# 3. Map Layers Processing ----
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+print("\n3. Map Layers Processing\n")
+
+# Close all previous map views
+aprx.closeViews()
+
+### Add Layers to Maps ----
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+print("\n- Add Layers to Maps")
+
+# Create a dictionary to store the layers
+lyr_dict = {}
+
+# Add the layers to the maps in the ArcGIS Pro project
+for key, m in map_dict.items():
+    year = key.replace("TL", "")
+    path = os.path.join(prj_dirs["gis"], key + ".gdb")
+    lyr_dict[key] = {}
+    print(f"\n- Map: {key} Layers:")
+    for lyr in gdb_dict[year]:
+        # Get the layer path
+        lyr_path = os.path.join(path, lyr)
+        # Add the layer to the map
+        map_lyr = m.addDataFromPath(lyr_path)
+        # Store the layer name in the dictionary
+        lyr_dict[key][lyr] = map_lyr.name
+        # Set the layer visibility to False
+        map_lyr.visible = False
+        print(f"- Added layer: {lyr} to map: {key}")
+
+# Write the layers dictionary to a JSON file
+lyr_dict_path = octl.write_dict_to_json(lyr_dict, "layers")
+
 
 ### Save the ArcGIS Pro Project ----
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
