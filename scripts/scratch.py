@@ -27,6 +27,31 @@ cb = octl.cb
 cb_df = octl.cb_df
 
 
+tl_metadata = octl.get_raw_data(export = True)
+
+
+
+
+
+# Set environment workspace to the folder containing shapefiles
+arcpy.env.workspace = tl_metadata["path"]
+
+
+# Get a list of all shapefiles in the folder
+shapefiles = arcpy.ListFeatureClasses("*.shp")
+tables = arcpy.ListTables("*.dbf")
+
+
+
+
+
+
+
+
+
+
+
+
 
 gdb_dict = octl.get_gdb_dict()
 

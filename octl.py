@@ -186,19 +186,19 @@ class OCTL:
 
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    ## Fx: Get Raw Data Function ----
+    ## Fx: Get Raw Data Dictionary ----
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    def get_raw_data(self) -> dict:
+    def get_raw_data(self, export = False) -> dict:
         """
         Get the raw data.
         Args:
-            Nothing
+            export (bool): If True, exports the metadata to a JSON file. Default is False.
         Returns:
-            tl_data (dict): The raw data dictionary.
+            tl_metadata (dict): The raw data metadata.
         Raises:
             ValueError: if there is no folder under the 'data/raw' directory
         Example:
-            >>>tl_data = get_raw_data()
+            >>>tl_metadata = get_raw_data()
         Notes:
             This function gets the raw data from the raw data directory.
         """ 
@@ -209,24 +209,94 @@ class OCTL:
         tl_path = os.path.join(self.prj_dirs["data_raw"], tl_folder)
         
         # Get the year from the folder name
-        tl_year = int(tl_folder.replace("tl_", ""))
+        tl_year = tl_folder.replace("tl_", "")
         print(f"Year: {tl_year}")
+
+        #Populate the metadata dictionary for each folder year
+        tl_metadata = {"folder": tl_folder, "year": int(tl_year), "path": tl_path}
+
+        # Get the directories inside each d_path
+        tl_levels = [sd for sd in os.listdir(tl_path) if os.path.isdir(os.path.join(tl_path, sd))]
+        tl_metadata["levels"] = {}
         
-        # Get the raw data from the folder: Remove the year prefix, and the extension and obtain only the unique names
-        tl_files = sorted(list({f.replace(f"tl_{tl_year}_", "").split(".")[0] for f in os.listdir(tl_path)}))
+        # Loop through each level in the directory
+        for level in tl_levels:
+            # Set the level path
+            level_path = os.path.join(tl_path, level)
+            
+            # Populate the metadata dictionary for each level
+            tl_metadata["levels"][level] = {}
+            # Find if there are any files with .shp extension
+            if any(f.endswith(".shp") for f in os.listdir(level_path)):
+                f_type = "Shapefile"
+            elif any(f.endswith(".dbf") for f in os.listdir(level_path)):
+                f_type = "Table"
+            else:
+                f_type = "Unknown"
+            
+            # Get all the unique files inside each level_path
+            tl_files = list(set([f.split(".")[0] for f in os.listdir(level_path) if os.path.isfile(os.path.join(level_path, f))]))
+            
+            # Loop through each file in the level
+            for f in tl_files:
+                # Extract the file year
+                file_year = f.split("_")[1]
 
-        # Combine the obtained variables into a data dictionary
-        tl_data = {
-            "folder": tl_folder,
-            "path": tl_path,
-            "year": tl_year,
-            "files": tl_files,
-            "count": len(tl_files)
-        }
-        print(f"There are {tl_data["count"]} unique files in the {tl_data["year"]} Tiger/Line raw data folder.")
+                # Extract the spatial level
+                file_spatial = f.split("_")[2]
+                match file_spatial:
+                    case "us":
+                        spatial_level = "US"
+                    case "06":
+                        spatial_level = "CA"
+                    case "06059":
+                        spatial_level = "OC"
+                    case _:
+                        spatial_level = "Unknown"
+                
+                # Extract the file abbreviation
+                file_abbrev = f.split("_")[3]
+                
+                # Populate the metadata dictionary for each file
+                tl_metadata["levels"][level]["type"] = f_type
+                tl_metadata["levels"][level]["file"] = f
+                tl_metadata["levels"][level]["path"] = level_path
+                tl_metadata["levels"][level]["year"] = int(file_year)
+                tl_metadata["levels"][level]["scale"] = spatial_level
+                tl_metadata["levels"][level]["spatial"] = file_spatial
 
-        # Return the data dictionary
-        return tl_data
+                # Calculate postfix information
+                len_diff = len(file_abbrev) - len(level)
+                file_postfix = ""
+                if len_diff > 0:
+                    file_postfix = file_abbrev[len(level):]
+                
+                # Populate abbreviation and postfix
+                tl_metadata["levels"][level]["abbrev"] = level.lower()
+                tl_metadata["levels"][level]["postfix"] = file_postfix
+                
+                # Populate postfix description
+                match len_diff:
+                    case 2:
+                        tl_metadata["levels"][level]["postfix_desc"] = f"20{file_postfix} US Census"
+                    case 3:
+                        tl_metadata["levels"][level]["postfix_desc"] = f"{file_postfix}th US Congress"
+                    case _:
+                        tl_metadata["levels"][level]["postfix_desc"] = ""
+        len_shp = sum(1 for level in tl_metadata["levels"].values() if level["type"] == "Shapefile")
+        len_tbl = sum(1 for level in tl_metadata["levels"].values() if level["type"] == "Table")
+        
+        print(f"Metadata extracted for year {tl_year}: {len_shp} Shapefiles and {len_tbl} Tables found.")
+
+        if export:
+            # Export metadata to JSON file
+            json_path = os.path.join(self.prj_dirs["metadata"], f"tl_{tl_year}_metadata.json")
+            with open(json_path, "w", encoding = "utf-8") as json_file:
+                json.dump(tl_metadata, json_file, indent=4)
+                print(f"Metadata exported to {json_path}")
+        
+        # Return the populated metadata dictionary
+        return tl_metadata
 
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1066,13 +1136,13 @@ class OCTL:
             This function processes shapefiles from the raw data directory and creates a geodatabase.
         """
         # Get the raw data from the OCTL class object
-        tl_data = self.get_raw_data()
+        tl_metadata = self.get_raw_data(export = True)
 
         # Create a scratch geodatabase
         scratch_gdb = self.scratch_gdb(method = "create")
 
         # Set environment workspace to the folder containing shapefiles
-        arcpy.env.workspace = tl_data["path"]
+        arcpy.env.workspace = tl_metadata["path"]
 
         # Get a list of all shapefiles in the folder
         shapefiles = arcpy.ListFeatureClasses("*.shp")
@@ -1104,10 +1174,10 @@ class OCTL:
             arcpy.env.workspace = os.getcwd()
 
         # Create a geodatabase for the year
-        tl_gdb = self.create_gdb(tl_data["year"])
+        tl_gdb = self.create_gdb(tl_metadata["year"])
 
         # Define the input and output feature classes for the county feature class
-        in_oc = os.path.join(scratch_gdb, f"tl_{tl_data["year"]}_us_county")
+        in_oc = os.path.join(scratch_gdb, f"tl_{tl_metadata["year"]}_us_county")
         out_oc = os.path.join(tl_gdb, self.cb["us_county"]["code2"])
 
         # Select rows with State and County FIPS codes
@@ -1127,7 +1197,7 @@ class OCTL:
         final_list = dict()
 
         # Create a list of feature classes to process and remove the us_county feature class
-        fc_list = [f.replace(f"tl_{tl_data["year"]}_", "") for f in scratch_fcs]
+        fc_list = [f.replace(f"tl_{tl_metadata["year"]}_", "") for f in scratch_fcs]
         fc_list.remove("us_county")
         final_list["CO"] = "us_county"
         
@@ -1135,12 +1205,12 @@ class OCTL:
         arcpy.AlterAliasName(out_oc, self.cb["us_county"]["alias"])
 
         # Create a metadata dictionary for the feature classes
-        md_dict = self.process_metadata(tl_data["year"])
+        md_dict = self.process_metadata(tl_metadata["year"])
 
         # Loop through the feature classes in the fc_list
         for f in fc_list:
             # Define the feature class name and code from the codebook
-            fc = f"tl_{tl_data["year"]}_{f}"
+            fc = f"tl_{tl_metadata["year"]}_{f}"
             code = self.cb[f]["code2"]
             # Define the input and output feature classes
             in_fc = os.path.join(scratch_gdb, fc)
@@ -1280,10 +1350,10 @@ class OCTL:
         # Create a metadata object for the TL geodatabase
         print(f"\nApplying metadata to the TL geodatabase:{tl_gdb}")
         md_gdb = md.Metadata(tl_gdb)
-        md_gdb.title = f"TL{tl_data["year"]} TigerLine Geodatabase"
+        md_gdb.title = f"TL{tl_metadata["year"]} TigerLine Geodatabase"
         md_gdb.tags = "Orange County, California, OCTL, TigerLine, Geodatabase"
-        md_gdb.summary = f"Orange County TigerLine Geodatabase for the {tl_data["year"]} year data"
-        md_gdb.description = f"Orange County TigerLine Geodatabase for the {tl_data["year"]} year data. The data contains feature classes for all TigerLine data available for Orange County, California."
+        md_gdb.summary = f"Orange County TigerLine Geodatabase for the {tl_metadata["year"]} year data"
+        md_gdb.description = f"Orange County TigerLine Geodatabase for the {tl_metadata["year"]} year data. The data contains feature classes for all TigerLine data available for Orange County, California."
         md_gdb.credits = "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services"
         md_gdb.accessConstraints = """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>"""
         md_gdb.thumbnailUri = "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"

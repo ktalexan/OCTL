@@ -54,7 +54,7 @@ cb = octl.cb
 cbdf = octl.cb_df
 
 # Get the raw data
-tl_data = octl.get_raw_data()
+tl_metadata = octl.get_raw_data(export = True)
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
