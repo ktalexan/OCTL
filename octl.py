@@ -202,101 +202,117 @@ class OCTL:
         Notes:
             This function gets the raw data from the raw data directory.
         """ 
-        # Get the folder name of the raw data
-        tl_folder = [d for d in os.listdir(self.prj_dirs["data_raw"]) if os.path.isdir(os.path.join(self.prj_dirs["data_raw"], d))][0]
-        
-        # Get the folder path
-        tl_path = os.path.join(self.prj_dirs["data_raw"], tl_folder)
-        
-        # Get the year from the folder name
-        tl_year = tl_folder.replace("tl_", "")
-        print(f"Year: {tl_year}")
+        # Initialize metadata dictionary
+        metadata = {}
 
-        #Populate the metadata dictionary for each folder year
-        tl_metadata = {"folder": tl_folder, "year": int(tl_year), "path": tl_path}
+        # Read all directories in the path
+        folder = [d for d in os.listdir(self.prj_dirs["data_raw"]) if os.path.isdir(os.path.join(self.prj_dirs["data_raw"], d))][0]
 
-        # Get the directories inside each d_path
-        tl_levels = [sd for sd in os.listdir(tl_path) if os.path.isdir(os.path.join(tl_path, sd))]
-        tl_metadata["levels"] = {}
-        
-        # Loop through each level in the directory
-        for level in tl_levels:
-            # Set the level path
-            level_path = os.path.join(tl_path, level)
-            
-            # Populate the metadata dictionary for each level
-            tl_metadata["levels"][level] = {}
-            # Find if there are any files with .shp extension
-            if any(f.endswith(".shp") for f in os.listdir(level_path)):
-                f_type = "Shapefile"
-            elif any(f.endswith(".dbf") for f in os.listdir(level_path)):
-                f_type = "Table"
+        # Set the directory path
+        folder_path = os.path.join(self.prj_dirs["data_raw"], folder)
+
+        # Relative folder path
+        relative_folder_path = os.path.relpath(folder_path, self.prj_dirs["root"])
+
+        # Extract year from directory name
+        year = folder.removeprefix("tl_")
+
+        # Create metadata dictionary folder data
+        metadata = {"year": int(year), "folder": folder, "path": relative_folder_path, "layers": {}}
+
+        # Define the layers to be checked
+        layers = ["addr", "addrfeat", "addrfn", "arealm", "areawater", "bg", "cbsa", "cd", "coastline", "county", "cousub", "csa", "edges", "elsd", "faces", "facesah", "facesal", "facesml", "featnames", "linearwater", "metdiv", "mil", "place", "pointlm", "primaryroads", "prisecroads", "puma", "rails", "roads", "scsd", "sldl", "sldu", "tabblock", "tract", "uac", "unsd", "zcta5"]
+
+        # Get the list of files in the folder
+        files = sorted(list(set([f.split(".")[0] for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))])))
+
+        # Get the list of files if the file has a .shp extension
+        shp_files = sorted(list(set([f.split(".")[0] for f in os.listdir(folder_path) if f.endswith(".shp")])))
+
+        # Get the list of files that are on files but not in shp_files
+        dbf_files = sorted([f for f in files if f not in shp_files])
+
+        # Print the count of files by type
+        print(f"Year: {year}\n- Total Files: {len(files)}\n- Shapefiles: {len(shp_files)}\n- Tables: {len(dbf_files)}")
+
+        # Loop through each file
+        for f in files:
+            # Split the file name into components
+            file_components = f.split("_")
+            # Extract the year, spatial level, and abbreviation
+            file_spatial = file_components[2]
+            file_abbrev = file_components[3]
+
+            # Check if the file is a shapefile or table
+            if f in shp_files:
+                file_type = "Shapefile"
+            elif f in dbf_files:
+                file_type = "Table"
             else:
-                f_type = "Unknown"
-            
-            # Get all the unique files inside each level_path
-            tl_files = list(set([f.split(".")[0] for f in os.listdir(level_path) if os.path.isfile(os.path.join(level_path, f))]))
-            
-            # Loop through each file in the level
-            for f in tl_files:
-                # Extract the file year
-                file_year = f.split("_")[1]
+                file_type = "Unknown"
 
-                # Extract the spatial level
-                file_spatial = f.split("_")[2]
-                match file_spatial:
-                    case "us":
-                        spatial_level = "US"
-                    case "06":
-                        spatial_level = "CA"
-                    case "06059":
-                        spatial_level = "OC"
-                    case _:
-                        spatial_level = "Unknown"
-                
-                # Extract the file abbreviation
-                file_abbrev = f.split("_")[3]
-                
-                # Populate the metadata dictionary for each file
-                tl_metadata["levels"][level]["type"] = f_type
-                tl_metadata["levels"][level]["file"] = f
-                tl_metadata["levels"][level]["path"] = level_path
-                tl_metadata["levels"][level]["year"] = int(file_year)
-                tl_metadata["levels"][level]["scale"] = spatial_level
-                tl_metadata["levels"][level]["spatial"] = file_spatial
-
-                # Calculate postfix information
-                len_diff = len(file_abbrev) - len(level)
+            # Check if the file layer is in the defined layers
+            if file_abbrev in layers:
+                file_layer = file_abbrev
                 file_postfix = ""
-                if len_diff > 0:
-                    file_postfix = file_abbrev[len(level):]
-                
-                # Populate abbreviation and postfix
-                tl_metadata["levels"][level]["abbrev"] = level.lower()
-                tl_metadata["levels"][level]["postfix"] = file_postfix
-                
-                # Populate postfix description
-                match len_diff:
-                    case 2:
-                        tl_metadata["levels"][level]["postfix_desc"] = f"20{file_postfix} US Census"
-                    case 3:
-                        tl_metadata["levels"][level]["postfix_desc"] = f"{file_postfix}th US Congress"
-                    case _:
-                        tl_metadata["levels"][level]["postfix_desc"] = ""
-        len_shp = sum(1 for level in tl_metadata["levels"].values() if level["type"] == "Shapefile")
-        len_tbl = sum(1 for level in tl_metadata["levels"].values() if level["type"] == "Table")
-        
-        print(f"Metadata extracted for year {tl_year}: {len_shp} Shapefiles and {len_tbl} Tables found.")
+            else:
+                # Find all the matches in file_abbrev that start with the layer
+                matches = [layer for layer in layers if file_abbrev.startswith(layer)]
+                # Check if any matches were found
+                if matches:
+                    # Get the match with the longest length
+                    file_layer = max(matches, key = len)
+                    # Extract the postfix from the file_abbrev
+                    file_postfix = file_abbrev.removeprefix(file_layer)
+                else:
+                    file_layer = "Unknown"
+                    file_postfix = ""
+
+            # Determine spatial level description
+            match file_spatial:
+                case "us":
+                    spatial_level = "US"
+                case "06":
+                    spatial_level = "CA"
+                case "06059":
+                    spatial_level = "OC"
+                case _:
+                    spatial_level = "Unknown"
+
+            # Calculate the length of the postfix
+            len_postfix = len(file_postfix)
+
+            # Determine postfix description
+            if len_postfix == 2:
+                file_postfix_desc = f"20{file_postfix} US Census"
+            elif len_postfix == 3:
+                file_postfix_desc = f"{file_postfix}th US Congress"
+            else:
+                file_postfix_desc = ""
+
+            # Populate the metadata dictionary
+            metadata["layers"][file_layer] = {
+                "type": file_type,
+                "file": f,
+                "scale": spatial_level,
+                "spatial": file_spatial,
+                "abbrev": file_abbrev,
+                "postfix": file_postfix,
+                "postfix_desc": file_postfix_desc
+            }
+
+        # Sort the metadata dictionary by file_layer
+        metadata["layers"] = dict(sorted(metadata["layers"].items()))
 
         if export:
             # Export metadata to JSON file
-            json_path = os.path.join(self.prj_dirs["metadata"], f"tl_{tl_year}_metadata.json")
+            json_path = os.path.join(self.prj_dirs["metadata"], f"raw_metadata_tl_{year}.json")
             with open(json_path, "w", encoding = "utf-8") as json_file:
-                json.dump(tl_metadata, json_file, indent=4)
+                json.dump(metadata, json_file, indent=4)
                 print(f"Metadata exported to {json_path}")
         
         # Return the populated metadata dictionary
-        return tl_metadata
+        return metadata
 
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

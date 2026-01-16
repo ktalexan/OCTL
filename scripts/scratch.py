@@ -32,6 +32,14 @@ tl_metadata = octl.get_raw_data(export = True)
 
 
 
+path_root = prj_dirs["root"]
+path_raw = prj_dirs["data_raw"]
+# Remove the path_root from the path_raw to get the relative path
+relative_path = os.path.relpath(path_raw, path_root)
+relative_path
+
+test = tl_metadata["cd"]["path"]
+os.path.relpath(test, path_root)
 
 # Set environment workspace to the folder containing shapefiles
 arcpy.env.workspace = tl_metadata["path"]
@@ -40,8 +48,6 @@ arcpy.env.workspace = tl_metadata["path"]
 # Get a list of all shapefiles in the folder
 shapefiles = arcpy.ListFeatureClasses("*.shp")
 tables = arcpy.ListTables("*.dbf")
-
-
 
 
 

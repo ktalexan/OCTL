@@ -1,0 +1,331 @@
+{
+    "year": 2010,
+    "folder": "tl_2010",
+    "path": "data\\raw\\tl_2010",
+    "layers": {
+        "addr": {
+            "type": "Table",
+            "file": "tl_2010_06059_addr",
+            "scale": "OC",
+            "spatial": "06059",
+            "abbrev": "addr",
+            "postfix": "",
+            "postfix_desc": ""
+        },
+        "addrfeat": {
+            "type": "Shapefile",
+            "file": "tl_2010_06059_addrfeat",
+            "scale": "OC",
+            "spatial": "06059",
+            "abbrev": "addrfeat",
+            "postfix": "",
+            "postfix_desc": ""
+        },
+        "addrfn": {
+            "type": "Table",
+            "file": "tl_2010_06059_addrfn",
+            "scale": "OC",
+            "spatial": "06059",
+            "abbrev": "addrfn",
+            "postfix": "",
+            "postfix_desc": ""
+        },
+        "arealm": {
+            "type": "Shapefile",
+            "file": "tl_2010_06059_arealm",
+            "scale": "OC",
+            "spatial": "06059",
+            "abbrev": "arealm",
+            "postfix": "",
+            "postfix_desc": ""
+        },
+        "areawater": {
+            "type": "Shapefile",
+            "file": "tl_2010_06059_areawater",
+            "scale": "OC",
+            "spatial": "06059",
+            "abbrev": "areawater",
+            "postfix": "",
+            "postfix_desc": ""
+        },
+        "bg": {
+            "type": "Shapefile",
+            "file": "tl_2010_06059_bg",
+            "scale": "OC",
+            "spatial": "06059",
+            "abbrev": "bg",
+            "postfix": "",
+            "postfix_desc": ""
+        },
+        "cbsa": {
+            "type": "Shapefile",
+            "file": "tl_2010_06_cbsa",
+            "scale": "CA",
+            "spatial": "06",
+            "abbrev": "cbsa",
+            "postfix": "",
+            "postfix_desc": ""
+        },
+        "cd": {
+            "type": "Shapefile",
+            "file": "tl_2010_06_cd111",
+            "scale": "CA",
+            "spatial": "06",
+            "abbrev": "cd111",
+            "postfix": "111",
+            "postfix_desc": "111th US Congress"
+        },
+        "coastline": {
+            "type": "Shapefile",
+            "file": "tl_2010_us_coastline",
+            "scale": "US",
+            "spatial": "us",
+            "abbrev": "coastline",
+            "postfix": "",
+            "postfix_desc": ""
+        },
+        "county": {
+            "type": "Shapefile",
+            "file": "tl_2010_06_county",
+            "scale": "CA",
+            "spatial": "06",
+            "abbrev": "county",
+            "postfix": "",
+            "postfix_desc": ""
+        },
+        "cousub": {
+            "type": "Shapefile",
+            "file": "tl_2010_06059_cousub",
+            "scale": "OC",
+            "spatial": "06059",
+            "abbrev": "cousub",
+            "postfix": "",
+            "postfix_desc": ""
+        },
+        "csa": {
+            "type": "Shapefile",
+            "file": "tl_2010_06_csa",
+            "scale": "CA",
+            "spatial": "06",
+            "abbrev": "csa",
+            "postfix": "",
+            "postfix_desc": ""
+        },
+        "edges": {
+            "type": "Shapefile",
+            "file": "tl_2010_06059_edges",
+            "scale": "OC",
+            "spatial": "06059",
+            "abbrev": "edges",
+            "postfix": "",
+            "postfix_desc": ""
+        },
+        "elsd": {
+            "type": "Shapefile",
+            "file": "tl_2010_06_elsd",
+            "scale": "CA",
+            "spatial": "06",
+            "abbrev": "elsd",
+            "postfix": "",
+            "postfix_desc": ""
+        },
+        "faces": {
+            "type": "Table",
+            "file": "tl_2010_us_facesmil",
+            "scale": "US",
+            "spatial": "us",
+            "abbrev": "facesmil",
+            "postfix": "mil",
+            "postfix_desc": "milth US Congress"
+        },
+        "facesah": {
+            "type": "Table",
+            "file": "tl_2010_06059_facesah",
+            "scale": "OC",
+            "spatial": "06059",
+            "abbrev": "facesah",
+            "postfix": "",
+            "postfix_desc": ""
+        },
+        "facesal": {
+            "type": "Table",
+            "file": "tl_2010_06059_facesal",
+            "scale": "OC",
+            "spatial": "06059",
+            "abbrev": "facesal",
+            "postfix": "",
+            "postfix_desc": ""
+        },
+        "featnames": {
+            "type": "Table",
+            "file": "tl_2010_06059_featnames",
+            "scale": "OC",
+            "spatial": "06059",
+            "abbrev": "featnames",
+            "postfix": "",
+            "postfix_desc": ""
+        },
+        "linearwater": {
+            "type": "Shapefile",
+            "file": "tl_2010_06059_linearwater",
+            "scale": "OC",
+            "spatial": "06059",
+            "abbrev": "linearwater",
+            "postfix": "",
+            "postfix_desc": ""
+        },
+        "metdiv": {
+            "type": "Shapefile",
+            "file": "tl_2010_06_metdiv",
+            "scale": "CA",
+            "spatial": "06",
+            "abbrev": "metdiv",
+            "postfix": "",
+            "postfix_desc": ""
+        },
+        "mil": {
+            "type": "Shapefile",
+            "file": "tl_2010_06_mil",
+            "scale": "CA",
+            "spatial": "06",
+            "abbrev": "mil",
+            "postfix": "",
+            "postfix_desc": ""
+        },
+        "place": {
+            "type": "Shapefile",
+            "file": "tl_2010_06_place",
+            "scale": "CA",
+            "spatial": "06",
+            "abbrev": "place",
+            "postfix": "",
+            "postfix_desc": ""
+        },
+        "pointlm": {
+            "type": "Shapefile",
+            "file": "tl_2010_06059_pointlm",
+            "scale": "OC",
+            "spatial": "06059",
+            "abbrev": "pointlm",
+            "postfix": "",
+            "postfix_desc": ""
+        },
+        "primaryroads": {
+            "type": "Shapefile",
+            "file": "tl_2010_us_primaryroads",
+            "scale": "US",
+            "spatial": "us",
+            "abbrev": "primaryroads",
+            "postfix": "",
+            "postfix_desc": ""
+        },
+        "prisecroads": {
+            "type": "Shapefile",
+            "file": "tl_2010_06_prisecroads",
+            "scale": "CA",
+            "spatial": "06",
+            "abbrev": "prisecroads",
+            "postfix": "",
+            "postfix_desc": ""
+        },
+        "puma": {
+            "type": "Shapefile",
+            "file": "tl_2010_06_puma10",
+            "scale": "CA",
+            "spatial": "06",
+            "abbrev": "puma10",
+            "postfix": "10",
+            "postfix_desc": "2010 US Census"
+        },
+        "rails": {
+            "type": "Shapefile",
+            "file": "tl_2010_us_rails",
+            "scale": "US",
+            "spatial": "us",
+            "abbrev": "rails",
+            "postfix": "",
+            "postfix_desc": ""
+        },
+        "roads": {
+            "type": "Shapefile",
+            "file": "tl_2010_06059_roads",
+            "scale": "OC",
+            "spatial": "06059",
+            "abbrev": "roads",
+            "postfix": "",
+            "postfix_desc": ""
+        },
+        "scsd": {
+            "type": "Shapefile",
+            "file": "tl_2010_06_scsd",
+            "scale": "CA",
+            "spatial": "06",
+            "abbrev": "scsd",
+            "postfix": "",
+            "postfix_desc": ""
+        },
+        "sldl": {
+            "type": "Shapefile",
+            "file": "tl_2010_06_sldl",
+            "scale": "CA",
+            "spatial": "06",
+            "abbrev": "sldl",
+            "postfix": "",
+            "postfix_desc": ""
+        },
+        "sldu": {
+            "type": "Shapefile",
+            "file": "tl_2010_06_sldu",
+            "scale": "CA",
+            "spatial": "06",
+            "abbrev": "sldu",
+            "postfix": "",
+            "postfix_desc": ""
+        },
+        "tabblock": {
+            "type": "Shapefile",
+            "file": "tl_2010_06059_tabblock10",
+            "scale": "OC",
+            "spatial": "06059",
+            "abbrev": "tabblock10",
+            "postfix": "10",
+            "postfix_desc": "2010 US Census"
+        },
+        "tract": {
+            "type": "Shapefile",
+            "file": "tl_2010_06059_tract",
+            "scale": "OC",
+            "spatial": "06059",
+            "abbrev": "tract",
+            "postfix": "",
+            "postfix_desc": ""
+        },
+        "uac": {
+            "type": "Shapefile",
+            "file": "tl_2010_us_uac10",
+            "scale": "US",
+            "spatial": "us",
+            "abbrev": "uac10",
+            "postfix": "10",
+            "postfix_desc": "2010 US Census"
+        },
+        "unsd": {
+            "type": "Shapefile",
+            "file": "tl_2010_06_unsd",
+            "scale": "CA",
+            "spatial": "06",
+            "abbrev": "unsd",
+            "postfix": "",
+            "postfix_desc": ""
+        },
+        "zcta5": {
+            "type": "Shapefile",
+            "file": "tl_2010_06_zcta510",
+            "scale": "CA",
+            "spatial": "06",
+            "abbrev": "zcta510",
+            "postfix": "10",
+            "postfix_desc": "2010 US Census"
+        }
+    }
+}
