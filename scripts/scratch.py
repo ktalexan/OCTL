@@ -2,11 +2,13 @@
 import os, sys, datetime
 from pathlib import Path
 import shutil
+import importlib
 import pandas as pd
 import arcpy
 from arcpy import metadata as md
 from arcgis.features import GeoAccessor, GeoSeriesAccessor
 from octl import OCTL
+
 
 # Set pandas options
 pd.options.mode.copy_on_write = True
@@ -16,6 +18,7 @@ arcpy.env.workspace = os.getcwd()
 arcpy.env.overwriteOutput = True
 
 # Initialize the OCTL class object
+#importlib.reload(sys.modules['octl'])
 octl = OCTL(part = 1, version = 2026.1)
 
 # Get the project metadata and directories from the OCTL class object
@@ -27,36 +30,99 @@ cb = octl.cb
 cb_df = octl.cb_df
 
 
+
+
+
+
+# Get the raw data from the OCTL class object
 tl_metadata = octl.get_raw_data(export = True)
 
-
-
-
-path_root = prj_dirs["root"]
-path_raw = prj_dirs["data_raw"]
-# Remove the path_root from the path_raw to get the relative path
-relative_path = os.path.relpath(path_raw, path_root)
-relative_path
-
-test = tl_metadata["cd"]["path"]
-os.path.relpath(test, path_root)
+# Create a scratch geodatabase
+scratch_gdb = octl.scratch_gdb(method = "create")
 
 # Set environment workspace to the folder containing shapefiles
-arcpy.env.workspace = tl_metadata["path"]
-
+arcpy.env.workspace = os.path.join(prj_dirs["root"], tl_metadata["path"])
 
 # Get a list of all shapefiles in the folder
 shapefiles = arcpy.ListFeatureClasses("*.shp")
 tables = arcpy.ListTables("*.dbf")
 
+if shapefiles:
+    # FeatureClassToGeodatabase accepts a list of inputs
+    arcpy.conversion.FeatureClassToGeodatabase(shapefiles, scratch_gdb)
+    print(arcpy.GetMessages())
+    print(f"\nSuccessfully imported {len(shapefiles)} shapefiles to {scratch_gdb}\n")
+else:
+    print("No shapefiles found in the specified directory.")
 
 
+if tables:
+    # FeatureClassToGeodatabase accepts a list of inputs
+    arcpy.conversion.TableToGeodatabase(tables, scratch_gdb)
+    print(arcpy.GetMessages())
+    print(f"\nSuccessfully imported {len(tables)} tables to {scratch_gdb}\n")
+else:
+    print("No tables found in the specified directory.")
+
+try:
+    # Set environment workspace to the scratch geodatabase
+    arcpy.env.workspace = scratch_gdb
+
+    # List of all feature classes in the scratch geodatabase
+    scratch_fcs = arcpy.ListFeatureClasses()
+    #scratch_tbls = arcpy.ListTables()
+finally:
+    # Set environment workspace to the current working directory
+    arcpy.env.workspace = os.getcwd()
+
+# Create a geodatabase for the year
+tl_gdb = octl.create_gdb(tl_metadata["year"])
+
+tl_metadata["layers"]["county"]["file"]
+
+# Define the input and output feature classes for the county feature class
+in_oc = os.path.join(scratch_gdb, tl_metadata["layers"]["county"]["file"]
+)
+out_oc = os.path.join(tl_gdb, cb["us_county"]["code2"])
 
 
+# Get the field name from the arcpy.ListFields(in_oc) if field.name contains "STATEFP" and "COUNTYFP"
+state_field = ""
+county_field = ""
+for field in arcpy.ListFields(in_oc):
+    if "STATEFP" in field.name:
+        state_field = field.name
+    elif "COUNTYFP" in field.name:
+        county_field = field.name
 
 
+if state_field and county_field:
+    # Select rows with State and County FIPS codes
+    arcpy.analysis.Select(
+        in_features = in_oc,
+        out_feature_class = out_oc,
+        where_clause = f"{state_field} = '06' And {county_field} = '059'"
+    )
 
+# Check if the output feature class is empty
+if int(arcpy.GetCount_management(out_oc).getOutput(0)) == 0:
+    arcpy.management.Delete(out_oc)
 
+# Create a list to store the final feature classes
+final_list = dict()
+
+# Create a list of feature classes to process and remove the us_county feature class
+fc_list = [f.replace(f"tl_{tl_metadata["year"]}_", "") for f in scratch_fcs]
+
+co_name = f"{tl_metadata["layers"]["county"]["spatial"]}_{tl_metadata["layers"]["county"]["abbrev"]}"
+fc_list.remove(co_name)
+final_list["CO"] = co_name
+
+# Alter the alias name of the county feature class
+arcpy.AlterAliasName(out_oc, cb[co_name]["alias"])
+
+# Create a metadata dictionary for the feature classes
+md_dict = self.process_metadata(tl_metadata["year"])
 
 
 gdb_dict = octl.get_gdb_dict()

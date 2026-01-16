@@ -223,14 +223,21 @@ class OCTL:
         # Define the layers to be checked
         layers = ["addr", "addrfeat", "addrfn", "arealm", "areawater", "bg", "cbsa", "cd", "coastline", "county", "cousub", "csa", "edges", "elsd", "faces", "facesah", "facesal", "facesml", "featnames", "linearwater", "metdiv", "mil", "place", "pointlm", "primaryroads", "prisecroads", "puma", "rails", "roads", "scsd", "sldl", "sldu", "tabblock", "tract", "uac", "unsd", "zcta5"]
 
-        # Get the list of files in the folder
-        files = sorted(list(set([f.split(".")[0] for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))])))
+        try:
+            # Set environment workspace to the folder path
+            arcpy.env.workspace = folder_path
 
-        # Get the list of files if the file has a .shp extension
-        shp_files = sorted(list(set([f.split(".")[0] for f in os.listdir(folder_path) if f.endswith(".shp")])))
+            # Get the shapefiles in the folder
+            shp_files = sorted([os.path.splitext(s)[0] for s in arcpy.ListFeatureClasses()])
 
-        # Get the list of files that are on files but not in shp_files
-        dbf_files = sorted([f for f in files if f not in shp_files])
+            # Get the list of tables in the folder
+            dbf_files = sorted([os.path.splitext(s)[0] for s in arcpy.ListTables()])
+        finally:
+            # Set environment workspace to the current working directory
+            arcpy.env.workspace = os.getcwd()
+
+        # Combine shapefiles and tables
+        files = sorted(list(set(shp_files + dbf_files)))
 
         # Print the count of files by type
         print(f"Year: {year}\n- Total Files: {len(files)}\n- Shapefiles: {len(shp_files)}\n- Tables: {len(dbf_files)}")
@@ -1158,7 +1165,7 @@ class OCTL:
         scratch_gdb = self.scratch_gdb(method = "create")
 
         # Set environment workspace to the folder containing shapefiles
-        arcpy.env.workspace = tl_metadata["path"]
+        arcpy.env.workspace = os.path.join(self.prj_dirs["root"], tl_metadata["path"])
 
         # Get a list of all shapefiles in the folder
         shapefiles = arcpy.ListFeatureClasses("*.shp")
@@ -1167,6 +1174,7 @@ class OCTL:
         if shapefiles:
             # FeatureClassToGeodatabase accepts a list of inputs
             arcpy.conversion.FeatureClassToGeodatabase(shapefiles, scratch_gdb)
+            print(arcpy.GetMessages())
             print(f"\nSuccessfully imported {len(shapefiles)} shapefiles to {scratch_gdb}\n")
         else:
             print("No shapefiles found in the specified directory.")
@@ -1174,6 +1182,7 @@ class OCTL:
         if tables:
             # FeatureClassToGeodatabase accepts a list of inputs
             arcpy.conversion.TableToGeodatabase(tables, scratch_gdb)
+            print(arcpy.GetMessages())
             print(f"\nSuccessfully imported {len(tables)} tables to {scratch_gdb}\n")
         else:
             print("No tables found in the specified directory.")
@@ -1193,32 +1202,43 @@ class OCTL:
         tl_gdb = self.create_gdb(tl_metadata["year"])
 
         # Define the input and output feature classes for the county feature class
-        in_oc = os.path.join(scratch_gdb, f"tl_{tl_metadata["year"]}_us_county")
+        in_oc = os.path.join(scratch_gdb, tl_metadata["layers"]["county"]["file"]
+)
         out_oc = os.path.join(tl_gdb, self.cb["us_county"]["code2"])
 
-        # Select rows with State and County FIPS codes
-        arcpy.analysis.Select(
-            in_features = in_oc,
-            out_feature_class = out_oc,
-            where_clause = "STATEFP = '06' And COUNTYFP = '059'"
-        )
+        # Get the field name from the arcpy.ListFields(in_oc) if field.name contains "STATEFP" and "COUNTYFP"
+        state_field = ""
+        county_field = ""
+        for field in arcpy.ListFields(in_oc):
+            if "STATEFP" in field.name:
+                state_field = field.name
+            elif "COUNTYFP" in field.name:
+                county_field = field.name
 
+        # Select rows with State and County FIPS codes
+        if state_field and county_field:
+            # Select rows with State and County FIPS codes
+            arcpy.analysis.Select(
+                in_features = in_oc,
+                out_feature_class = out_oc,
+                where_clause = f"{state_field} = '06' And {county_field} = '059'"
+            )
 
         # Check if the output feature class is empty
         if int(arcpy.GetCount_management(out_oc).getOutput(0)) == 0:
             arcpy.management.Delete(out_oc)
 
-        
         # Create a list to store the final feature classes
         final_list = dict()
 
         # Create a list of feature classes to process and remove the us_county feature class
         fc_list = [f.replace(f"tl_{tl_metadata["year"]}_", "") for f in scratch_fcs]
-        fc_list.remove("us_county")
-        final_list["CO"] = "us_county"
+        co_name = f"{tl_metadata["layers"]["county"]["spatial"]}_{tl_metadata["layers"]["county"]["abbrev"]}"
+        fc_list.remove(co_name)
+        final_list["CO"] = co_name
         
         # Alter the alias name of the county feature class
-        arcpy.AlterAliasName(out_oc, self.cb["us_county"]["alias"])
+        arcpy.AlterAliasName(out_oc, self.cb[co_name]["alias"])
 
         # Create a metadata dictionary for the feature classes
         md_dict = self.process_metadata(tl_metadata["year"])

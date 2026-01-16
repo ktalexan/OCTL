@@ -181,6 +181,19 @@
         "code3": "UCD",
         "method": "within"
     },
+    "06_county": {
+        "alias": "Counties",
+        "type": "Shapefile",
+        "group": "Geographic Areas",
+        "cat": "Counties",
+        "label": "County and Equivalent",
+        "level": "CA",
+        "prefix": "06",
+        "code": "COUNTY",
+        "code2": "CO",
+        "code3": "COU",
+        "method": "query"
+    },
     "06_cousub": {
         "alias": "County Subdivisions",
         "type": "Shapefile",
