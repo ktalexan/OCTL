@@ -12,6 +12,7 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 import os, sys
 from datetime import datetime as dt
+import wmi
 import json
 from pathlib import Path
 import pandas as pd
@@ -46,6 +47,44 @@ class OCTL:
 
         # Create a prj_dirs variable calling the project_directories function
         self.prj_dirs = self.project_directories(silent = False)
+
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ## Fx: Get Remote Path by Drive Label Name ----
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    def get_remote_path(self, label_name: str) -> str | None:
+        """
+        Get the remote path based on the drive label name.
+        Args:
+            label_name (str): The label name of the drive to search for.
+        Returns:
+            str | None: The remote path if found, otherwise None.
+        Raises:
+            ValueError: If label_name is not a string.
+        Example:
+            >>> remote_path = get_remote_path("DRKWD02")
+        Notes:
+            This function uses the WMI library to query the system's logical disks
+            and find the drive with the specified label name. If found, it constructs
+            and returns the remote path; otherwise, it returns None.
+        """
+        # Validate input
+        if not isinstance(label_name, str):
+            raise ValueError("label_name must be a string")
+        # Query WMI for logical disks
+        c = wmi.WMI()
+        # Iterate through logical disks to find the one with the specified label
+        for drive in c.Win32_LogicalDisk():
+            # VolumeName is the disk label (e.g., "Backup", "USB_DRIVE")
+            if drive.VolumeName == label_name:
+                # Returns network path or drive letter
+                drive_letter = drive.ProviderName if drive.ProviderName else drive.DeviceID
+                # Construct the remote path
+                remote_path = f"{drive_letter}\\Professional\\OCPW Projects\\OCGD\\OCTL\\OCTLRaw"
+                # Return the remote path
+                return remote_path
+        # If no drive is found, return None
+        return None
 
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1059,7 +1098,7 @@ class OCTL:
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ## Fx: Get Raw Data Dictionary ----
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    def get_raw_data(self, export: bool = False) -> dict:
+    def get_raw_data(self, remote: bool = True, export: bool = False) -> dict:
         """
         Get the raw data.
         Args:
@@ -1073,128 +1112,152 @@ class OCTL:
         Notes:
             This function gets the raw data from the raw data directory.
         """ 
+
         # Initialize metadata dictionary
         metadata = {}
 
-        # Read all directories in the path
-        folder = [d for d in os.listdir(self.prj_dirs["data_raw"]) if os.path.isdir(os.path.join(self.prj_dirs["data_raw"], d))][0]
+        # Set the raw data directory
+        raw_directory = self.prj_dirs["data_raw"]
 
-        # Set the directory path
-        folder_path = os.path.join(self.prj_dirs["data_raw"], folder)
+        # Redefine raw_directory if running remotely
+        if remote:
+            # Get the remote path by drive label name
+            raw_directory = self.get_remote_path("DRKWD02")
+            if not raw_directory:
+                raise ValueError("Remote path not found. Please ensure the drive is connected.")
 
-        # Relative folder path
-        relative_folder_path = os.path.relpath(folder_path, self.prj_dirs["root"])
+        # Get the directory one level up
+        root_directory = Path(raw_directory).parent.as_posix()
 
-        # Extract year from directory name
-        year = folder.removeprefix("tl_")
-
-        # Create metadata dictionary folder data
-        metadata = {"version": self.version, "date": self.data_date, "year": int(year), "folder": folder, "path": relative_folder_path, "layers": {}}
+        # List all folders in the raw data directory that start with "tl"
+        raw_folders = [f for f in os.listdir(raw_directory) if os.path.isdir(os.path.join(raw_directory, f)) and f.startswith("tl")]
 
         # Define the layers to be checked
         layers = ["addr", "addrfeat", "addrfn", "arealm", "areawater", "bg", "cbsa", "cd", "coastline", "county", "cousub", "csa", "edges", "elsd", "faces", "facesah", "facesal", "facesmil", "featnames", "linearwater", "metdiv", "mil", "place", "pointlm", "primaryroads", "prisecroads", "puma", "rails", "roads", "scsd", "sldl", "sldu", "tabblock", "tract", "uac", "unsd", "zcta5"]
 
-        try:
-            # Set environment workspace to the folder path
-            arcpy.env.workspace = folder_path
 
-            # Get the shapefiles in the folder
-            shp_files = sorted([os.path.splitext(s)[0] for s in arcpy.ListFeatureClasses()])
+        for folder in raw_folders:
+            folder_path = os.path.join(raw_directory, folder)
+            relative_folder_path = os.path.relpath(folder_path, root_directory)
+            year = folder.removeprefix("tl_")
+            metadata[year] = {
+                "version": self.version,
+                "date": self.data_date,
+                "year": int(year),
+                "folder": folder,
+                "path": relative_folder_path,
+                "layers": {}
+                }
 
-            # Get the list of tables in the folder
-            dbf_files = sorted([os.path.splitext(s)[0] for s in arcpy.ListTables()])
-        finally:
-            # Set environment workspace to the current working directory
-            arcpy.env.workspace = os.getcwd()
+            # Initialize lists for shapefiles and tables
+            try:
+                # Set environment workspace to the folder path
+                arcpy.env.workspace = folder_path
 
-        # Combine shapefiles and tables
-        files = sorted(list(set(shp_files + dbf_files)))
+                # Get the shapefiles in the folder
+                shp_files = sorted([os.path.splitext(s)[0] for s in arcpy.ListFeatureClasses()])
 
-        # Print the count of files by type
-        print(f"Year: {year}\n- Total Files: {len(files)}\n- Shapefiles: {len(shp_files)}\n- Tables: {len(dbf_files)}")
+                # Get the list of tables in the folder
+                dbf_files = sorted([os.path.splitext(s)[0] for s in arcpy.ListTables()])
+            finally:
+                # Set environment workspace to the current working directory
+                arcpy.env.workspace = os.getcwd()
 
-        # Create an intermediary layers dictionary
-        layers_metadata = {}
+            # Combine shapefiles and tables
+            files = sorted(list(set(shp_files + dbf_files)))
 
-        # Loop through each file
-        for f in files:
-            # Split the file name into components
-            file_components = f.split("_")
-            # Extract the year, spatial level, and abbreviation
-            file_spatial = file_components[2]
-            file_abbrev = file_components[3]
+            # Print the count of files by type
+            print(f"Year: {year}\n- Total Files: {len(files)}\n- Shapefiles: {len(shp_files)}\n- Tables: {len(dbf_files)}")
 
-            # Check if the file is a shapefile or table
-            if f in shp_files:
-                file_type = "Shapefile"
-            elif f in dbf_files:
-                file_type = "Table"
-            else:
-                file_type = "Unknown"
+            # Create an intermediary layers dictionary
+            layers_metadata = {}
 
-            # Check if the file layer is in the defined layers
-            if file_abbrev in layers:
-                file_layer = file_abbrev
-                file_postfix = ""
-            else:
-                # Find all the matches in file_abbrev that start with the layer
-                matches = [layer for layer in layers if file_abbrev.startswith(layer)]
-                # Check if any matches were found
-                if matches:
-                    # Get the match with the longest length
-                    file_layer = max(matches, key = len)
-                    # Extract the postfix from the file_abbrev
-                    file_postfix = file_abbrev.removeprefix(file_layer)
+            # Loop through each file
+            for f in files:
+                # Split the file name into components
+                file_components = f.split("_")
+                # Extract the year, spatial level, and abbreviation
+                file_spatial = file_components[2]
+                file_abbrev = file_components[3]
+
+                # Check if the file is a shapefile or table
+                if f in shp_files:
+                    file_type = "Shapefile"
+                elif f in dbf_files:
+                    file_type = "Table"
                 else:
-                    file_layer = "Unknown"
+                    file_type = "Unknown"
+
+                # Check if the file layer is in the defined layers
+                if file_abbrev in layers:
+                    file_layer = file_abbrev
                     file_postfix = ""
+                else:
+                    # Find all the matches in file_abbrev that start with the layer
+                    matches = [layer for layer in layers if file_abbrev.startswith(layer)]
+                    # Check if any matches were found
+                    if matches:
+                        # Get the match with the longest length
+                        file_layer = max(matches, key = len)
+                        # Extract the postfix from the file_abbrev
+                        file_postfix = file_abbrev.removeprefix(file_layer)
+                    else:
+                        file_layer = "Unknown"
+                        file_postfix = ""
 
-            # Determine spatial level description
-            match file_spatial:
-                case "us":
-                    spatial_level = "US"
-                case "06":
-                    spatial_level = "CA"
-                case "06059":
-                    spatial_level = "OC"
-                case _:
-                    spatial_level = "Unknown"
+                # Determine spatial level description
+                match file_spatial:
+                    case "us":
+                        spatial_level = "US"
+                    case "06":
+                        spatial_level = "CA"
+                    case "06059":
+                        spatial_level = "OC"
+                    case _:
+                        spatial_level = "Unknown"
 
-            # Calculate the length of the postfix
-            len_postfix = len(file_postfix)
+                # Calculate the length of the postfix
+                len_postfix = len(file_postfix)
 
-            # Determine postfix description
-            if len_postfix == 2:
-                file_postfix_desc = f"20{file_postfix} US Census"
-            elif len_postfix == 3:
-                file_postfix_desc = f"{file_postfix}th US Congress"
-            else:
-                file_postfix_desc = ""
+                # Determine postfix description
+                if len_postfix == 2:
+                    file_postfix_desc = f"20{file_postfix} US Census"
+                elif len_postfix == 3:
+                    file_postfix_desc = f"{file_postfix}th US Congress"
+                else:
+                    file_postfix_desc = ""
 
-            # Populate the metadata dictionary
-            layers_metadata[file_layer] = {
-                "type": file_type,
-                "file": f,
-                "scale": spatial_level,
-                "spatial": file_spatial,
-                "abbrev": file_abbrev,
-                "postfix": file_postfix,
-                "postfix_desc": file_postfix_desc
-            }
+                # Populate the metadata dictionary
+                layers_metadata[file_layer] = {
+                    "type": file_type,
+                    "file": f,
+                    "scale": spatial_level,
+                    "spatial": file_spatial,
+                    "abbrev": file_abbrev,
+                    "postfix": file_postfix,
+                    "postfix_desc": file_postfix_desc
+                }
 
-        # Sort the metadata dictionary by file_layer
-        layers_metadata = dict(sorted(layers_metadata.items()))
+            # Sort the metadata dictionary by file_layer
+            layers_metadata = dict(sorted(layers_metadata.items()))
 
-        # Add layers metadata to the main metadata dictionary
-        metadata["layers"] = self.codebook_metadata(int(year), layers_metadata)
+            # Add layers metadata to the main metadata dictionary
+            metadata[year]["layers"] = self.codebook_metadata(int(year), layers_metadata)
+
+            if export:
+                # Export metadata to JSON file
+                json_path = os.path.join(self.prj_dirs["metadata"], f"raw_metadata_tl_{year}.json")
+                with open(json_path, "w", encoding = "utf-8") as json_file:
+                    json.dump(metadata[year], json_file, indent=4)
+                    print(f"Metadata for year {year} exported to {json_path}")
 
         if export:
             # Export metadata to JSON file
-            json_path = os.path.join(self.prj_dirs["metadata"], f"raw_metadata_tl_{year}.json")
+            json_path = os.path.join(self.prj_dirs["metadata"], f"folder_metadata.json")
             with open(json_path, "w", encoding = "utf-8") as json_file:
                 json.dump(metadata, json_file, indent=4)
-                print(f"Metadata exported to {json_path}")
-        
+                print(f"Metadata for year {year} exported to {json_path}")
+
         # Return the populated metadata dictionary
         return metadata
 

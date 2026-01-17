@@ -3,7 +3,7 @@
     "date": "January 2026",
     "year": 2017,
     "folder": "tl_2017",
-    "path": "data\\raw\\tl_2017",
+    "path": "OCTLRaw\\tl_2017",
     "layers": {
         "addr": {
             "type": "Table",
@@ -197,7 +197,7 @@
             "abbrev": "county",
             "postfix": "",
             "postfix_desc": "",
-            "alias": "OCTL 2017 Counties",
+            "alias": "OCTL 2017 Orange County",
             "group": "Geographic Areas",
             "category": "Counties",
             "label": "County and Equivalent",
