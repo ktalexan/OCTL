@@ -383,7 +383,7 @@ class OCTL:
                 "abbrev": layers_metadata["county"]["abbrev"],
                 "postfix": layers_metadata["county"]["postfix"],
                 "postfix_desc": layers_metadata["county"]["postfix_desc"],
-                "alias": f"OCTL {year} Counties",
+                "alias": f"OCTL {year} Orange County",
                 "group": "Geographic Areas",
                 "category": "Counties",
                 "label": "County and Equivalent",
@@ -1665,7 +1665,7 @@ class OCTL:
             "title": f"OCTL {year} Map",
             "tags": f"Orange County, California, Tiger/Line, OCTL, TL{year}",
             "summary": f"Orange County Tiger Lines Map for {year}",
-            "description": f"Orange County Tiger Lines {year} Map containing the most up-to-date spatial data for Orange County, California. This map is part of the Orange County Tiger Lines (OCTL) project, which provides comprehensive geospatial data for the county. The data includes roads, boundaries, hydrography, and other essential features derived from the U.S. Census Bureau's Tiger/Line shapefiles for {year}.",
+            "description": f"Orange County Tiger Lines {year} Map containing the most up-to-date spatial data for Orange County, California. This map is part of the Orange County Tiger Lines (OCTL) project, which provides comprehensive geospatial data for the county. The data includes roads, boundaries, hydrography, and other essential features derived from the U.S. Census Bureau's Tiger/Line shapefiles for {year}. Version: {self.version}, last updated on {self.data_date}.",
             "credits": "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services",
             "access": """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>""",
             "uri": "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"
@@ -1710,6 +1710,59 @@ class OCTL:
 
         # Return the filename
         return filename
+
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ## Fx: Master Codebook ----
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    def master_codebook(self, create: bool = False) -> dict:
+        """
+        Create a master codebook JSON file from the raw metadata files
+        Args:
+            create (bool): If True, creates the master codebook. If False, loads the existing master codebook. Default is False.
+        Returns:
+            master_cb (dict): The master codebook.
+        Raises:
+            Nothing
+        Example:
+            >>> master_cb = master_codebook()
+        Notes:
+            This function creates a master codebook JSON file from the raw metadata files.
+        """
+        # Get the project directories
+        master_cb = {}
+        master_cb_path = os.path.join(self.prj_dirs["codebook"], "cb_master.json")
+        # Check if the create flag is set to True
+        if create:
+            # Get a list of json files from the raw metadata directory that start with "ram_metadata_tl_"
+            json_files = list(Path(self.prj_dirs["metadata"]).glob("raw_metadata_tl_*.json"))
+            # Loop through the json files and read them into a list
+            for jf in json_files:
+                # Load the json file
+                with open(jf, "r", encoding = "utf-8") as f:
+                    jf_dict = json.load(f)
+                print(f"Processing file for year {jf_dict['year']}")
+                # Get the year from the json file
+                year = jf_dict["year"]
+                # Get the layers from the json file
+                layers = jf_dict["layers"]
+                # Add the layers to the master codebook dictionary
+                master_cb[year] = layers
+            # Save the master codebook to the master codebook path
+            with open(master_cb_path, "w", encoding = "utf-8") as f:
+                json.dump(master_cb, f, indent = 4)
+            # Return the master codebook dictionary
+            return master_cb
+        else:
+            # Check if the master codebook file exists
+            if not os.path.exists(master_cb_path):
+                raise FileNotFoundError(f"Master codebook file not found at {master_cb_path}. Please create it first by setting create=True.")
+            print(f"Loading master codebook from {master_cb_path}")
+            # Load the master codebook from the master codebook path
+            with open(master_cb_path, "r", encoding = "utf-8") as f:
+                master_cb = json.load(f)
+            # Return the master codebook dictionary
+            return master_cb
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

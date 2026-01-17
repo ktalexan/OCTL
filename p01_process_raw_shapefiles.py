@@ -20,7 +20,8 @@ print("\n1. Preliminaries\n")
 print("\n1.1. Referencing Libraries and Initialization\n")
 
 # Import necessary libraries
-import os, sys, datetime
+import os, sys
+from datetime import datetime as dt
 from pathlib import Path
 import shutil
 import pandas as pd
@@ -63,3 +64,17 @@ print("\n2. Process Shapefiles to Geodatabase\n")
 
 # Process the shapefiles and get the dictionary of feature classes and codes
 tl_dict = octl.process_shapefiles()
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# 3. Update Master Codebook ----
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+print("\n3. Update Master Codebook\n")
+
+# Create or load the master codebook
+cb_master = octl.master_codebook(create = True)
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# End of Script ----
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

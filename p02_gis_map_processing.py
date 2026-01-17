@@ -20,7 +20,9 @@ print("\n1. Preliminaries\n")
 print("\n1.1. Referencing Libraries and Initialization\n")
 
 # Import necessary libraries
-import os, sys, datetime
+import os, sys
+from datetime import datetime as dt
+import json
 from pathlib import Path
 import shutil
 import pandas as pd
@@ -49,9 +51,8 @@ octl = OCTL(part = 2, version = 2026.1)
 prj_meta = octl.prj_meta
 prj_dirs = octl.prj_dirs
 
-# Get the codebook from the OCTL class object
-cb = octl.cb
-cbdf = octl.cb_df
+# Get the master codebook (load from JSON file)
+cb = octl.master_codebook(create = False)
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -65,24 +66,8 @@ print("\n2. ArcGIS Pro Project Map Processing\n")
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 print("\n2.1. Create Maps in ArcGIS Pro Project\n")
 
-# Get the geodatabase dictionary from the OCTL class object
-gdb_dict = octl.get_gdb_dict()
-
-# Alter the alias names of the feature classes in the geodatabases
-for y, g in gdb_dict.items():
-    print(f"\nAltering alias names in geodatabase for year {y}:")
-    g_path = os.path.join(prj_dirs["gis"], f"TL{y}.gdb")
-    for m, f in g.items():
-        m_path = os.path.join(g_path, m)
-        f_alias = f["alias"]
-        arcpy.AlterAliasName(m_path, f_alias)
-        print(f"- Altered alias name of {m} to {f_alias}")
-
-# Write the geodatabase dictionary to a JSON file
-gdb_dict_path = octl.write_dict_to_json(gdb_dict, "gdbs")
-
 # Get the list of years from the geodatabase dictionary keys
-year_list = [int(y) for y in gdb_dict]
+year_list = [int(y) for y in cb]
 
 # Load the ArcGIS Pro project
 aprx_path = prj_dirs['gis_aprx']
@@ -133,18 +118,20 @@ print("\n- Change Basemap to 'Light Gray Canvas'")
 
 # Change the Map Base Map to "Light Gray Canvas"
 for m in map_dict.values():
+    print(m.name)
     for l in m.listLayers():
         if l.isBasemapLayer:
-            print(f"- Removing existing basemap layer from {m.name}...")
+            print(f"- Removing existing basemap layer {l.name}...")
             m.removeLayer(l)
-    print(f"- Setting {m.name} basemap to 'Light Gray Canvas'...")
+    print("- Setting basemap to 'Light Gray Canvas'...")
     m.addBasemap("Light Gray Canvas")
 
 # Turn off the basemap layer visibility
 for m in map_dict.values():
-    print(f"- Turning off basemap layer visibility in {m.name}...")
+    print(m.name)
     for l in m.listLayers():
         if l.isBasemapLayer and l.name == "Light Gray Reference":
+            print(f"- {l.name} visibility is off...")
             l.visible = False
 
 
@@ -201,17 +188,19 @@ for key, m in map_dict.items():
     year = key.replace("TL", "")
     path = os.path.join(prj_dirs["gis"], key + ".gdb")
     lyr_dict[key] = {}
-    print(f"\n- Map: {key} Layers:")
-    for lyr in gdb_dict[year]:
+    print(f"\nMap: {key} Layers:")
+    for lyr in cb[year].values():
         # Get the layer path
-        lyr_path = os.path.join(path, lyr)
+        lyr_path = os.path.join(path, lyr["code"])
         # Add the layer to the map
         map_lyr = m.addDataFromPath(lyr_path)
         # Store the layer name in the dictionary
-        lyr_dict[key][lyr] = map_lyr.name
+        lyr_dict[key][lyr["code"]] = map_lyr.name
         # Set the layer visibility to False
         map_lyr.visible = False
-        print(f"- Added layer: {lyr} to map: {key}")
+        print(f"- Added layer: {lyr['code']} to map: {key}")
+
+
 
 # Write the layers dictionary to a JSON file
 lyr_dict_path = octl.write_dict_to_json(lyr_dict, "layers")
