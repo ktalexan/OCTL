@@ -49,12 +49,11 @@ octl = OCTL(part = 1, version = 2026.1)
 prj_meta = octl.prj_meta
 prj_dirs = octl.prj_dirs
 
-# Get the codebook from the OCTL class object
-cb = octl.cb
-cbdf = octl.cb_df
-
-# Get the raw data
+# Get the raw metadata
 tl_metadata = octl.get_raw_data(export = True)
+
+# Get the codebook from the OCTL class object
+cb, cbdf = octl.load_cb(tl_metadata["year"],  cbdf = True)
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
