@@ -209,7 +209,7 @@ class OCTL:
                 "title": f"OCTL {year} Adress Ranges Relationship",
                 "tags": f"{entry_tags}, Address, Relationships, Table",
                 "summary": f"Orange County Tiger Lines {year} Address Ranges Relationship Table",
-                "description": f"Orange County Tiger Lines {year} Address Ranges Relationship Table. This table contains address range information for features in the Tiger/Line shapefiles.",
+                "description": f"Orange County Tiger Lines {year} Address Ranges Relationship Table. This table contains address range information for features in the Tiger/Line shapefiles. Version {self.version}, Last Updated: {self.data_date}.",
                 "credits": entry_credits,
                 "access": entry_access,
                 "uri": entry_uri
@@ -232,7 +232,7 @@ class OCTL:
                 "title": f"OCTL {year} Address Range Features",
                 "tags": f"{entry_tags}, Address, Relationships, Table",
                 "summary": f"Orange County Tiger Lines {year} Address Range Features",
-                "description": f"Orange County Tiger Lines {year} Address Range Features. This shapefile contains address range feature information for features in the Tiger/Line shapefiles.",
+                "description": f"Orange County Tiger Lines {year} Address Range Features. This shapefile contains address range feature information for features in the Tiger/Line shapefiles. Version {self.version}, Last Updated: {self.data_date}.",
                 "credits": entry_credits,
                 "access": entry_access,
                 "uri": entry_uri
@@ -255,7 +255,7 @@ class OCTL:
                 "title": f"OCTL {year} Address Range-Feature Name Relationship",
                 "tags": f"{entry_tags}, Address, Relationships, Table",
                 "summary": f"Orange County Tiger Lines {year} Address Range-Feature Name Relationship Table",
-                "description": f"Orange County Tiger Lines {year} Address Range-Feature Name Relationship Table. This table contains address range-feature name information for features in the Tiger/Line shapefiles.",
+                "description": f"Orange County Tiger Lines {year} Address Range-Feature Name Relationship Table. This table contains address range-feature name information for features in the Tiger/Line shapefiles. Version {self.version}, Last Updated: {self.data_date}.",
                 "credits": entry_credits,
                 "access": entry_access,
                 "uri": entry_uri
@@ -278,7 +278,7 @@ class OCTL:
                 "title": f"OCTL {year} Area Landmarks",
                 "tags": f"{entry_tags}, Area, Landmarks, Features",
                 "summary": f"Orange County Tiger Lines {year} Area Landmarks",
-                "description": f"Orange County Tiger Lines {year} Area Landmarks. This shapefile contains area landmark feature information for features in the Tiger/Line shapefiles.",
+                "description": f"Orange County Tiger Lines {year} Area Landmarks. This shapefile contains area landmark feature information for features in the Tiger/Line shapefiles. Version {self.version}, Last Updated: {self.data_date}.",
                 "credits": entry_credits,
                 "access": entry_access,
                 "uri": entry_uri
@@ -301,7 +301,7 @@ class OCTL:
                 "title": f"OCTL {year} Area Hydrography",
                 "tags": f"{entry_tags}, Water, Hydrography, Features",
                 "summary": f"Orange County Tiger Lines {year} Area Hydrography",
-                "description": f"Orange County Tiger Lines {year} Area Hydrography. This shapefile contains area hydrography feature information for features in the Tiger/Line shapefiles.",
+                "description": f"Orange County Tiger Lines {year} Area Hydrography. This shapefile contains area hydrography feature information for features in the Tiger/Line shapefiles. Version {self.version}, Last Updated: {self.data_date}.",
                 "credits": entry_credits,
                 "access": entry_access,
                 "uri": entry_uri
@@ -324,7 +324,7 @@ class OCTL:
                 "title": f"OCTL {year} Block Groups",
                 "tags": f"{entry_tags}, US Census, Block Groups",
                 "summary": f"Orange County Tiger Lines {year} Block Groups",
-                "description": f"Orange County Tiger Lines {year} Block Groups. This shapefile contains block group geographic area information for features in the Tiger/Line shapefiles.",
+                "description": f"Orange County Tiger Lines {year} Block Groups. This shapefile contains block group geographic area information for features in the Tiger/Line shapefiles. Version {self.version}, Last Updated: {self.data_date}.",
                 "credits": entry_credits,
                 "access": entry_access,
                 "uri": entry_uri
@@ -347,7 +347,7 @@ class OCTL:
                 "title": f"OCTL {year} Metropolitan Statistical Areas",
                 "tags": f"{entry_tags}, US Census, Metropolitan Statistical Areas",
                 "summary": f"Orange County Tiger Lines {year} Metropolitan Statistical Areas",
-                "description": f"Orange County Tiger Lines {year} Metropolitan Statistical Areas. This shapefile contains metropolitan statistical area geographic area information for features in the Tiger/Line shapefiles.",
+                "description": f"Orange County Tiger Lines {year} Metropolitan Statistical Areas. This shapefile contains metropolitan statistical area geographic area information for features in the Tiger/Line shapefiles. Version {self.version}, Last Updated: {self.data_date}.",
                 "credits": entry_credits,
                 "access": entry_access,
                 "uri": entry_uri
@@ -370,7 +370,7 @@ class OCTL:
                 "title": f"OCTL {year} Coastlines",
                 "tags": f"{entry_tags}, Coastlines",
                 "summary": f"Orange County Tiger Lines {year} Coastlines",
-                "description": f"Orange County Tiger Lines {year} Coastlines. This shapefile contains coastline geographic area information for features in the Tiger/Line shapefiles.",
+                "description": f"Orange County Tiger Lines {year} Coastlines. This shapefile contains coastline geographic area information for features in the Tiger/Line shapefiles. Version {self.version}, Last Updated: {self.data_date}.",
                 "credits": entry_credits,
                 "access": entry_access,
                 "uri": entry_uri
@@ -393,7 +393,7 @@ class OCTL:
                 "title": f"OCTL {year} Orange County",
                 "tags": f"{entry_tags}, Counties",
                 "summary": f"Orange County Tiger Lines {year} Orange County",
-                "description": f"Orange County Tiger Lines {year} Orange County. This shapefile contains county geographic area information for features in the Tiger/Line shapefiles.",
+                "description": f"Orange County Tiger Lines {year} Orange County. This shapefile contains county geographic area information for features in the Tiger/Line shapefiles. Version {self.version}, Last Updated: {self.data_date}.",
                 "credits": entry_credits,
                 "access": entry_access,
                 "uri": entry_uri
@@ -416,7 +416,7 @@ class OCTL:
                 "title": f"OCTL {year} Combined Statistical Areas",
                 "tags": f"{entry_tags}, US Census, Statistical Areas",
                 "summary": f"Orange County Tiger Lines {year} Combined Statistical Areas",
-                "description": f"Orange County Tiger Lines {year} Combined Statistical Areas. This shapefile contains combined statistical area geographic area information for features in the Tiger/Line shapefiles.",
+                "description": f"Orange County Tiger Lines {year} Combined Statistical Areas. This shapefile contains combined statistical area geographic area information for features in the Tiger/Line shapefiles. Version {self.version}, Last Updated: {self.data_date}.",
                 "credits": entry_credits,
                 "access": entry_access,
                 "uri": entry_uri
@@ -439,7 +439,7 @@ class OCTL:
                 "title": f"OCTL {year} Congressional Districts",
                 "tags": f"{entry_tags}, Congressional Districts",
                 "summary": f"Orange County Tiger Lines {year} Congressional Districts of the {layers_metadata["cd"]["postfix_desc"]}",
-                "description": f"Orange County Tiger Lines {year} Congressional Districts of the {layers_metadata["cd"]["postfix_desc"]}. This shapefile contains congressional district geographic area information for features in the Tiger/Line shapefiles.",
+                "description": f"Orange County Tiger Lines {year} Congressional Districts of the {layers_metadata["cd"]["postfix_desc"]}. This shapefile contains congressional district geographic area information for features in the Tiger/Line shapefiles. Version {self.version}, Last Updated: {self.data_date}.",
                 "credits": entry_credits,
                 "access": entry_access,
                 "uri": entry_uri
@@ -462,7 +462,7 @@ class OCTL:
                 "title": f"OCTL {year} County Subdivisions",
                 "tags": f"{entry_tags}, counties, subdivisions",
                 "summary": f"Orange County Tiger Lines {year} County Subdivisions",
-                "description": f"Orange County Tiger Lines {year} County Subdivisions. This shapefile contains county subdivision geographic area information for features in the Tiger/Line shapefiles.",
+                "description": f"Orange County Tiger Lines {year} County Subdivisions. This shapefile contains county subdivision geographic area information for features in the Tiger/Line shapefiles. Version {self.version}, Last Updated: {self.data_date}.",
                 "credits": entry_credits,
                 "access": entry_access,
                 "uri": entry_uri
@@ -485,7 +485,7 @@ class OCTL:
                 "title": f"OCTL {year} All Lines",
                 "tags": f"{entry_tags}, all lines",
                 "summary": f"Orange County Tiger Lines {year} All Lines",
-                "description": f"Orange County Tiger Lines {year} All Lines. This shapefile contains all line features in the Tiger/Line shapefiles.",
+                "description": f"Orange County Tiger Lines {year} All Lines. This shapefile contains all line features in the Tiger/Line shapefiles. Version {self.version}, Last Updated: {self.data_date}.",
                 "credits": entry_credits,
                 "access": entry_access,
                 "uri": entry_uri
@@ -508,7 +508,7 @@ class OCTL:
                 "title": f"OCTL {year} Elementary School Districts",
                 "tags": f"{entry_tags}, schools, school districts, elementary schools",
                 "summary": f"Orange County Tiger Lines {year} Elementary School Districts",
-                "description": f"Orange County Tiger Lines {year} Elementary School Districts. This shapefile contains elementary school district geographic area information for features in the Tiger/Line shapefiles.",
+                "description": f"Orange County Tiger Lines {year} Elementary School Districts. This shapefile contains elementary school district geographic area information for features in the Tiger/Line shapefiles. Version {self.version}, Last Updated: {self.data_date}.",
                 "credits": entry_credits,
                 "access": entry_access,
                 "uri": entry_uri
@@ -531,7 +531,7 @@ class OCTL:
                 "title": f"OCTL {year} Topological Faces-Military Installations",
                 "tags": f"{entry_tags}, military installations",
                 "summary": f"Orange County Tiger Lines {year} Topological Faces-Military Installations Table",
-                "description": f"Orange County Tiger Lines {year} Topological Faces-Military Installations. This shapefile contains topological faces and military installations relationship information for features in the Tiger/Line shapefiles.",
+                "description": f"Orange County Tiger Lines {year} Topological Faces-Military Installations. This shapefile contains topological faces and military installations relationship information for features in the Tiger/Line shapefiles. Version {self.version}, Last Updated: {self.data_date}.",
                 "credits": entry_credits,
                 "access": entry_access,
                 "uri": entry_uri
@@ -554,7 +554,7 @@ class OCTL:
                 "title": f"OCTL {year} Topological Faces",
                 "tags": f"{entry_tags}, faces, relationships",
                 "summary": f"Orange County Tiger Lines {year} Topological Faces",
-                "description": f"Orange County Tiger Lines {year} Topological Faces. This shapefile contains topological faces (polygons with all geocodes) information for features in the Tiger/Line shapefiles.",
+                "description": f"Orange County Tiger Lines {year} Topological Faces. This shapefile contains topological faces (polygons with all geocodes) information for features in the Tiger/Line shapefiles. Version {self.version}, Last Updated: {self.data_date}.",
                 "credits": entry_credits,
                 "access": entry_access,
                 "uri": entry_uri
@@ -577,7 +577,7 @@ class OCTL:
                 "title": f"OCTL {year} Topological Faces-Area Hydrography",
                 "tags": f"{entry_tags}, feces, water, hydrography",
                 "summary": f"Orange County Tiger Lines {year} Topological Faces-Area Hydrography",
-                "description": f"Orange County Tiger Lines {year} Topological Faces-Area Hydrography. This shapefile contains topological faces and area hydrography relationship information for features in the Tiger/Line shapefiles.",
+                "description": f"Orange County Tiger Lines {year} Topological Faces-Area Hydrography. This shapefile contains topological faces and area hydrography relationship information for features in the Tiger/Line shapefiles. Version {self.version}, Last Updated: {self.data_date}.",
                 "credits": entry_credits,
                 "access": entry_access,
                 "uri": entry_uri
@@ -600,7 +600,7 @@ class OCTL:
                 "title": f"OCTL {year} Topological Faces-Area Landmark",
                 "tags": f"{entry_tags}, faces, landmarks",
                 "summary": f"Orange County Tiger Lines {year} Topological Faces-Area Landmark",
-                "description": f"Orange County Tiger Lines {year} Topological Faces-Area Landmark. This shapefile contains topological faces and area landmark relationship information for features in the Tiger/Line shapefiles.",
+                "description": f"Orange County Tiger Lines {year} Topological Faces-Area Landmark. This shapefile contains topological faces and area landmark relationship information for features in the Tiger/Line shapefiles. Version {self.version}, Last Updated: {self.data_date}.",
                 "credits": entry_credits,
                 "access": entry_access,
                 "uri": entry_uri
@@ -623,7 +623,7 @@ class OCTL:
                 "title": f"OCTL {year} Feature Names",
                 "tags": f"{entry_tags}, names, relationships",
                 "summary": f"Orange County Tiger Lines {year} Feature Names Table",
-                "description": f"Orange County Tiger Lines {year} Feature Names. This shapefile contains feature names relationship information for features in the Tiger/Line shapefiles.",
+                "description": f"Orange County Tiger Lines {year} Feature Names. This shapefile contains feature names relationship information for features in the Tiger/Line shapefiles. Version {self.version}, Last Updated: {self.data_date}.",
                 "credits": entry_credits,
                 "access": entry_access,
                 "uri": entry_uri
@@ -646,7 +646,7 @@ class OCTL:
                 "title": f"OCTL {year} Linear Hydrography",
                 "tags": f"{entry_tags}, water, hydrography",
                 "summary": f"Orange County Tiger Lines {year} Linear Hydrography",
-                "description": f"Orange County Tiger Lines {year} Linear Hydrography. This shapefile contains linear hydrography features in the Tiger/Line shapefiles.",
+                "description": f"Orange County Tiger Lines {year} Linear Hydrography. This shapefile contains linear hydrography features in the Tiger/Line shapefiles. Version {self.version}, Last Updated: {self.data_date}.",
                 "credits": entry_credits,
                 "access": entry_access,
                 "uri": entry_uri
@@ -669,7 +669,7 @@ class OCTL:
                 "title": f"OCTL {year} Metropolitan Divisions",
                 "tags": f"{entry_tags}, metropolitan divisions",
                 "summary": f"Orange County Tiger Lines {year} Metropolitan Divisions",
-                "description": f"Orange County Tiger Lines {year} Metropolitan Divisions. This shapefile contains metropolitan division features in the Tiger/Line shapefiles.",
+                "description": f"Orange County Tiger Lines {year} Metropolitan Divisions. This shapefile contains metropolitan division features in the Tiger/Line shapefiles. Version {self.version}, Last Updated: {self.data_date}.",
                 "credits": entry_credits,
                 "access": entry_access,
                 "uri": entry_uri
@@ -692,7 +692,7 @@ class OCTL:
                 "title": f"OCTL {year} Military Installations",
                 "tags": f"{entry_tags}, military installations",
                 "summary": f"Orange County Tiger Lines {year} Military Installations",
-                "description": f"Orange County Tiger Lines {year} Military Installations. This shapefile contains military installation features in the Tiger/Line shapefiles.",
+                "description": f"Orange County Tiger Lines {year} Military Installations. This shapefile contains military installation features in the Tiger/Line shapefiles. Version {self.version}, Last Updated: {self.data_date}.",
                 "credits": entry_credits,
                 "access": entry_access,
                 "uri": entry_uri
@@ -715,7 +715,7 @@ class OCTL:
                 "title": f"OCTL {year} Cities or Places",
                 "tags": f"{entry_tags}, places, cities",
                 "summary": f"Orange County Tiger Lines {year} Cities or Places",
-                "description": f"Orange County Tiger Lines {year} Cities or Places. This shapefile contains city and place features in the Tiger/Line shapefiles.",
+                "description": f"Orange County Tiger Lines {year} Cities or Places. This shapefile contains city and place features in the Tiger/Line shapefiles. Version {self.version}, Last Updated: {self.data_date}.",
                 "credits": entry_credits,
                 "access": entry_access,
                 "uri": entry_uri
@@ -738,7 +738,7 @@ class OCTL:
                 "title": f"OCTL {year} Point Landmarks",
                 "tags": f"{entry_tags}, points, landmarks",
                 "summary": f"Orange County Tiger Lines {year} Point Landmarks",
-                "description": f"Orange County Tiger Lines {year} Point Landmarks. This shapefile contains point landmark features in the Tiger/Line shapefiles.",
+                "description": f"Orange County Tiger Lines {year} Point Landmarks. This shapefile contains point landmark features in the Tiger/Line shapefiles. Version {self.version}, Last Updated: {self.data_date}.",
                 "credits": entry_credits,
                 "access": entry_access,
                 "uri": entry_uri
@@ -761,7 +761,7 @@ class OCTL:
                 "title": f"OCTL {year} Primary Roads",
                 "tags": f"{entry_tags}, roads, primary",
                 "summary": f"Orange County Tiger Lines {year} Primary Roads",
-                "description": f"Orange County Tiger Lines {year} Primary Roads. This shapefile contains primary road features in the Tiger/Line shapefiles.",
+                "description": f"Orange County Tiger Lines {year} Primary Roads. This shapefile contains primary road features in the Tiger/Line shapefiles. Version {self.version}, Last Updated: {self.data_date}.",
                 "credits": entry_credits,
                 "access": entry_access,
                 "uri": entry_uri
@@ -784,7 +784,7 @@ class OCTL:
                 "title": f"OCTL {year} Primary and Secondary Roads",
                 "tags": f"{entry_tags}, roads, primary, secondary",
                 "summary": f"Orange County Tiger Lines {year} Primary and Secondary Roads",
-                "description": f"Orange County Tiger Lines {year} Primary and Secondary Roads. This shapefile contains primary and secondary road features in the Tiger/Line shapefiles.",
+                "description": f"Orange County Tiger Lines {year} Primary and Secondary Roads. This shapefile contains primary and secondary road features in the Tiger/Line shapefiles. Version {self.version}, Last Updated: {self.data_date}.",
                 "credits": entry_credits,
                 "access": entry_access,
                 "uri": entry_uri
@@ -807,7 +807,7 @@ class OCTL:
                 "title": f"OCTL {year} Public Use Microdata Areas",
                 "tags": f"{entry_tags}, public use microdata areas",
                 "summary": f"Orange County Tiger Lines {year} Public Use Microdata Areas",
-                "description": f"Orange County Tiger Lines {year} Public Use Microdata Areas. This shapefile contains public use microdata area features in the Tiger/Line shapefiles.",
+                "description": f"Orange County Tiger Lines {year} Public Use Microdata Areas. This shapefile contains public use microdata area features in the Tiger/Line shapefiles. Version {self.version}, Last Updated: {self.data_date}.",
                 "credits": entry_credits,
                 "access": entry_access,
                 "uri": entry_uri
@@ -830,7 +830,7 @@ class OCTL:
                 "title": f"OCTL {year} Rails",
                 "tags": f"{entry_tags}, rails, railroads",
                 "summary": f"Orange County Tiger Lines {year} Rails",
-                "description": f"Orange County Tiger Lines {year} Rails. This shapefile contains rail features in the Tiger/Line shapefiles.",
+                "description": f"Orange County Tiger Lines {year} Rails. This shapefile contains rail features in the Tiger/Line shapefiles. Version {self.version}, Last Updated: {self.data_date}.",
                 "credits": entry_credits,
                 "access": entry_access,
                 "uri": entry_uri
@@ -853,7 +853,7 @@ class OCTL:
                 "title": f"OCTL {year} All Roads",
                 "tags": f"{entry_tags}, roads",
                 "summary": f"Orange County Tiger Lines {year} All Roads",
-                "description": f"Orange County Tiger Lines {year} All Roads. This shapefile contains road features in the Tiger/Line shapefiles.",
+                "description": f"Orange County Tiger Lines {year} All Roads. This shapefile contains road features in the Tiger/Line shapefiles. Version {self.version}, Last Updated: {self.data_date}.",
                 "credits": entry_credits,
                 "access": entry_access,
                 "uri": entry_uri
@@ -876,7 +876,7 @@ class OCTL:
                 "title": f"OCTL {year} Secondary School Districts",
                 "tags": f"{entry_tags}, schools, school districts, secondary schools",
                 "summary": f"Orange County Tiger Lines {year} Secondary School Districts",
-                "description": f"Orange County Tiger Lines {year} Secondary School Districts. This shapefile contains secondary school district features in the Tiger/Line shapefiles.",
+                "description": f"Orange County Tiger Lines {year} Secondary School Districts. This shapefile contains secondary school district features in the Tiger/Line shapefiles. Version {self.version}, Last Updated: {self.data_date}.",
                 "credits": entry_credits,
                 "access": entry_access,
                 "uri": entry_uri
@@ -899,7 +899,7 @@ class OCTL:
                 "title": f"OCTL {year} State Assembly Legislative Districts",
                 "tags": f"{entry_tags}, legislative districts, state assembly",
                 "summary": f"Orange County Tiger Lines {year} State Assembly Legislative Districts",
-                "description": f"Orange County Tiger Lines {year} State Assembly Legislative Districts. This shapefile contains state assembly legislative district (lower chamber) features in the Tiger/Line shapefiles.",
+                "description": f"Orange County Tiger Lines {year} State Assembly Legislative Districts. This shapefile contains state assembly legislative district (lower chamber) features in the Tiger/Line shapefiles. Version {self.version}, Last Updated: {self.data_date}.",
                 "credits": entry_credits,
                 "access": entry_access,
                 "uri": entry_uri
@@ -922,7 +922,7 @@ class OCTL:
                 "title": f"OCTL {year} State Senate Legislative Districts",
                 "tags": f"{entry_tags}, legislative districts, state senate",
                 "summary": f"Orange County Tiger Lines {year} State Senate Legislative Districts",
-                "description": f"Orange County Tiger Lines {year} State Senate Legislative Districts. This shapefile contains state senate legislative district (upper chamber) features in the Tiger/Line shapefiles.",
+                "description": f"Orange County Tiger Lines {year} State Senate Legislative Districts. This shapefile contains state senate legislative district (upper chamber) features in the Tiger/Line shapefiles. Version {self.version}, Last Updated: {self.data_date}.",
                 "credits": entry_credits,
                 "access": entry_access,
                 "uri": entry_uri
@@ -945,7 +945,7 @@ class OCTL:
                 "title": f"OCTL {year} Blocks",
                 "tags": f"{entry_tags}, US Census, blocks",
                 "summary": f"Orange County Tiger Lines {year} Blocks",
-                "description": f"Orange County Tiger Lines {year} Blocks. This shapefile contains block features in the Tiger/Line shapefiles.",
+                "description": f"Orange County Tiger Lines {year} Blocks. This shapefile contains block features in the Tiger/Line shapefiles. Version {self.version}, Last Updated: {self.data_date}.",
                 "credits": entry_credits,
                 "access": entry_access,
                 "uri": entry_uri
@@ -968,7 +968,7 @@ class OCTL:
                 "title": f"OCTL {year} Census Tracts",
                 "tags": f"{entry_tags}, US Census, census tracts",
                 "summary": f"Orange County Tiger Lines {year} Census Tracts",
-                "description": f"Orange County Tiger Lines {year} Census Tracts. This shapefile contains census tract features in the Tiger/Line shapefiles.",
+                "description": f"Orange County Tiger Lines {year} Census Tracts. This shapefile contains census tract features in the Tiger/Line shapefiles. Version {self.version}, Last Updated: {self.data_date}.",
                 "credits": entry_credits,
                 "access": entry_access,
                 "uri": entry_uri
@@ -991,7 +991,7 @@ class OCTL:
                 "title": f"OCTL {year} Unified School Districts",
                 "tags": f"{entry_tags}, schools, school districts, unified schools",
                 "summary": f"Orange County Tiger Lines {year} Unified School Districts",
-                "description": f"Orange County Tiger Lines {year} Unified School Districts. This shapefile contains unified school district features in the Tiger/Line shapefiles.",
+                "description": f"Orange County Tiger Lines {year} Unified School Districts. This shapefile contains unified school district features in the Tiger/Line shapefiles. Version {self.version}, Last Updated: {self.data_date}.",
                 "credits": entry_credits,
                 "access": entry_access,
                 "uri": entry_uri
@@ -1014,7 +1014,7 @@ class OCTL:
                 "title": f"OCTL {year} Urban Areas",
                 "tags": f"{entry_tags}, urban areas",
                 "summary": f"Orange County Tiger Lines {year} Urban Areas",
-                "description": f"Orange County Tiger Lines {year} Urban Areas. This shapefile contains urban area features in the Tiger/Line shapefiles.",
+                "description": f"Orange County Tiger Lines {year} Urban Areas. This shapefile contains urban area features in the Tiger/Line shapefiles. Version {self.version}, Last Updated: {self.data_date}.",
                 "credits": entry_credits,
                 "access": entry_access,
                 "uri": entry_uri
@@ -1037,7 +1037,7 @@ class OCTL:
                 "title": f"OCTL {year} ZIP Code Tabulation Areas",
                 "tags": f"{entry_tags}, ZIP Codes, ZCTA",
                 "summary": f"Orange County Tiger Lines {year} ZIP Code Tabulation Areas",
-                "description": f"Orange County Tiger Lines {year} ZIP Code Tabulation Areas. This shapefile contains ZIP Code Tabulation Area features in the Tiger/Line shapefiles.",
+                "description": f"Orange County Tiger Lines {year} ZIP Code Tabulation Areas. This shapefile contains ZIP Code Tabulation Area features in the Tiger/Line shapefiles. Version {self.version}, Last Updated: {self.data_date}.",
                 "credits": entry_credits,
                 "access": entry_access,
                 "uri": entry_uri
@@ -1568,7 +1568,7 @@ class OCTL:
         md_gdb.title = f"TL{tl_metadata["year"]} TigerLine Geodatabase"
         md_gdb.tags = "Orange County, California, OCTL, TigerLine, Geodatabase"
         md_gdb.summary = f"Orange County TigerLine Geodatabase for the {tl_metadata["year"]} year data"
-        md_gdb.description = f"Orange County TigerLine Geodatabase for the {tl_metadata["year"]} year data. The data contains feature classes for all TigerLine data available for Orange County, California."
+        md_gdb.description = f"Orange County TigerLine Geodatabase for the {tl_metadata["year"]} year data. The data contains feature classes for all TigerLine data available for Orange County, California. Version: {self.version}, last updated on {self.data_date}."
         md_gdb.credits = "Dr. Kostas Alexandridis, GISP, Data Scientist, OC Public Works, OC Survey Geospatial Services"
         md_gdb.accessConstraints = """The feed data and associated resources (maps, apps, endpoints) can be used under a <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">Creative Commons CC-SA-BY</a> License, providing attribution to OC Public Works, OC Survey Geospatial Services. <div><br /></div><div>We make every effort to provide the most accurate and up-to-date data and information. Nevertheless the data feed is provided, 'as is' and OC Public Work's standard <a href="https://www.ocgov.com/contact-county/disclaimer" target="_blank">Disclaimer</a> applies.</div><div><br /></div><div>For any inquiries, suggestions or questions, please contact:</div><div><br /></div><div style="text-align:center;"><a href="https://www.linkedin.com/in/ktalexan/" target="_blank"><b>Dr. Kostas Alexandridis, GISP</b></a><br /></div><div style="text-align:center;">GIS Analyst | Spatial Complex Systems Scientist</div><div style="text-align:center;">OC Public Works/OC Survey Geospatial Applications</div><div style="text-align:center;"><div>601 N. Ross Street, P.O. Box 4048, Santa Ana, CA 92701</div><div>Email: <a href="mailto:kostas.alexandridis@ocpw.ocgov.com" target="_blank">kostas.alexandridis@ocpw.ocgov.com</a> | Phone: (714) 967-0826</div></div>"""
         md_gdb.thumbnailUri = "https://ocpw.maps.arcgis.com/sharing/rest/content/items/67ce28a349d14451a55d0415947c7af3/data"
