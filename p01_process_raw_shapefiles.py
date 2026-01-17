@@ -51,11 +51,10 @@ prj_meta = octl.prj_meta
 prj_dirs = octl.prj_dirs
 
 # Get the raw metadata
-tl_metadata = octl.get_raw_data(export = True)
+# folder_metadata = octl.get_raw_data(remote = True, export = True)
 
 # Get the codebook from the OCTL class object
-cb, cbdf = octl.load_cb(tl_metadata["year"],  cbdf = True)
-
+# cb, cbdf = octl.load_cb(folder_metadata["year"],  cbdf = True)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 2. Process Shapefiles to Geodatabase ----
@@ -63,7 +62,7 @@ cb, cbdf = octl.load_cb(tl_metadata["year"],  cbdf = True)
 print("\n2. Process Shapefiles to Geodatabase\n")
 
 # Process the shapefiles and get the dictionary of feature classes and codes
-tl_dict = octl.process_shapefiles()
+process_dict = octl.process_shapefiles()
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

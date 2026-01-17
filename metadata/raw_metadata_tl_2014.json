@@ -3,7 +3,8 @@
     "date": "January 2026",
     "year": 2014,
     "folder": "tl_2014",
-    "path": "OCTLRaw\\tl_2014",
+    "path": "D:\\Professional\\OCPW Projects\\OCGD\\OCTL\\OCTLRaw\\tl_2014",
+    "relative_path": "OCTLRaw\\tl_2014",
     "layers": {
         "addr": {
             "type": "Table",
